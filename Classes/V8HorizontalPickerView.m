@@ -107,7 +107,7 @@
 	}
 
 	SEL titleForElementSelector = @selector(horizontalPickerView:titleForElementAtIndex:);
-	SEL viewForElementSelector  = @selector(horizontalPickerView:viewForElementAtIndex:);
+    SEL childrenForElementSelector = @selector(horizontalPickerView:childrenForElementAtIndex:);
 	SEL setSelectedSelector     = @selector(setSelectedElement:);
 
 	CGRect visibleBounds   = [self bounds];
@@ -152,22 +152,44 @@
 				if (self.delegate && [self.delegate respondsToSelector:titleForElementSelector]) {
 					NSString *title = [self.delegate horizontalPickerView:self titleForElementAtIndex:i];
 					view = [self labelForForElementAtIndex:i withTitle:title];
-				} else if (self.delegate && [self.delegate respondsToSelector:viewForElementSelector]) {
-					view = [self.delegate horizontalPickerView:self viewForElementAtIndex:i];
-				}
-
-				if (view) {
                     // use the index as the tag so we can find it later
 					view.tag = [self tagForElementAtIndex:i];
 					[_scrollView addSubview:view];
-                    
-                    UIView *lineView = [[UIView alloc] initWithFrame:CGRectMake(i * elementWidth, 0, 1, visibleBounds.size.height)];
-                    lineView.backgroundColor = [UIColor redColor];
-                    [_scrollView addSubview:lineView];
-
-				}
+				} 
 			}
 		}
+    
+    
+        // draw sub elements
+        NSArray * subElements = [self.delegate horizontalPickerView:self childrenForElementAtIndex:i];   
+        NSInteger numberOfSubElements = [subElements count];
+        NSLog(@"number of sub elements ==> %d", numberOfSubElements);
+    
+        int interval; 
+        if (numberOfSubElements < 2) 
+        {
+            interval = elementWidth / 2;
+            numberOfSubElements = 1;
+
+        }        
+        else {
+            interval = elementWidth / (numberOfSubElements + 1);
+        }
+    
+    int location = interval;
+    for (int j = 0; j < numberOfSubElements; j++)
+    {
+        UIView *subLineView = [[UIView alloc] initWithFrame:CGRectMake(i * elementWidth + location, 0, 1, 30)];
+        subLineView.backgroundColor = [UIColor greenColor];
+        [_scrollView addSubview:subLineView];
+        location += interval;
+    }
+    
+    
+        // draw element divider lines
+        UIView *lineView = [[UIView alloc] initWithFrame:CGRectMake(i * elementWidth, 0, 1, visibleBounds.size.height)];
+        lineView.backgroundColor = [UIColor redColor];
+        [_scrollView addSubview:lineView];
 	} 
     
 	// save off what's visible now

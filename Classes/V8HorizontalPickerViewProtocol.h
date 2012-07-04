@@ -26,6 +26,7 @@
 
 // one of these two methods must be defined
 - (NSString *)horizontalPickerView:(V8HorizontalPickerView *)picker titleForElementAtIndex:(NSInteger)index;
+- (NSArray *)horizontalPickerView:(V8HorizontalPickerView *)picker childrenForElementAtIndex:(NSInteger)index;
 - (UIView *)horizontalPickerView:(V8HorizontalPickerView *)picker viewForElementAtIndex:(NSInteger)index;
 // any view returned from this must confirm to the V8HorizontalPickerElementState protocol
 

@@ -30,9 +30,11 @@ int indexCount;
         
         TTItem * javaItem = [TTItem alloc];
         javaItem.itemName = @"Java";
+        javaItem.items = [NSArray arrayWithObjects:@"JavaOne", @"JavaTwo", @"JavaThree", nil];
         
         TTItem * htmlItem = [TTItem alloc];
         htmlItem.itemName = @"HTML";
+        htmlItem.items = [NSArray arrayWithObjects:@"HTMLOne", @"HTMLTwo", nil];
         
         TTItem * objcItem = [TTItem alloc];
         objcItem.itemName = @"Objective-C";
@@ -42,7 +44,8 @@ int indexCount;
         
         TTItem * rubyItem = [TTItem alloc];
         rubyItem.itemName = @"Ruby";
-        
+        rubyItem.items = [NSArray arrayWithObjects:@"RubyOne", @"RubyTwo", @"RubyThree", @"RubyFour", @"RubyFive", nil];
+
         TTItem * pythonItem = [TTItem alloc];
         pythonItem.itemName = @"Python";
         
@@ -229,6 +232,10 @@ int indexCount;
     return item.itemName;
 }
 
+- (NSArray *)horizontalPickerView:(V8HorizontalPickerView *)picker childrenForElementAtIndex:(NSInteger)index {
+	TTItem * item = [dataArray objectAtIndex:index];
+    return item.items;
+}
 
 - (void)horizontalPickerView:(V8HorizontalPickerView *)picker didSelectElementAtIndex:(NSInteger)index {
 	self.infoLabel.text = [NSString stringWithFormat:@"Selected index %d", index];
