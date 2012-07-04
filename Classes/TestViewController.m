@@ -7,7 +7,7 @@
 //
 
 #import "TestViewController.h"
-
+#import "TTItem.h"
 
 @implementation TestViewController
 
@@ -16,15 +16,48 @@
 @synthesize infoLabel;
 
 #pragma mark - iVars
-NSMutableArray *titleArray;
+
+NSMutableArray * dataArray;
 int indexCount;
 
 #pragma mark - Init/Dealloc
 - (id)init {
 	self = [super init];
 	if (self) {
-		titleArray = [NSMutableArray arrayWithObjects:@"All", @"Today", @"Thursday", @"Wednesday", @"Tuesday", @"Monday", nil];
+
 		indexCount = 0;
+        
+        
+        TTItem * javaItem = [TTItem alloc];
+        javaItem.itemName = @"Java";
+        
+        TTItem * htmlItem = [TTItem alloc];
+        htmlItem.itemName = @"HTML";
+        
+        TTItem * objcItem = [TTItem alloc];
+        objcItem.itemName = @"Objective-C";
+        
+        TTItem * javascriptItem = [TTItem alloc];
+        javascriptItem.itemName = @"Javascript";
+        
+        TTItem * rubyItem = [TTItem alloc];
+        rubyItem.itemName = @"Ruby";
+        
+        TTItem * pythonItem = [TTItem alloc];
+        pythonItem.itemName = @"Python";
+        
+        TTItem * cItem = [TTItem alloc];
+        cItem.itemName = @"C++";
+        
+        TTItem * shellItem = [TTItem alloc];
+        shellItem.itemName = @"Shell";
+        
+        TTItem * phpItem = [TTItem alloc];
+        phpItem.itemName = @"PHP";
+        
+        dataArray = [NSMutableArray arrayWithObjects: javaItem, htmlItem, objcItem, javascriptItem, rubyItem, pythonItem, cItem, shellItem, phpItem, nil];
+
+        NSLog(@"Hello %d", [dataArray count]);
 	}
 	return self;
 }
@@ -42,7 +75,7 @@ int indexCount;
 	self.view.backgroundColor = [UIColor blackColor];
 	CGFloat margin = 40.0f;
 	CGFloat width = (self.view.bounds.size.width - (margin * 2.0f));
-	CGFloat pickerHeight = 40.0f;
+	CGFloat pickerHeight = 100.0f;
 	CGFloat x = margin;
 	CGFloat y = 150.0f;
 	CGFloat spacing = 25.0f;
@@ -169,7 +202,7 @@ int indexCount;
 - (void)nextButtonTapped:(id)sender {
 	[pickerView scrollToElement:indexCount animated:NO];
 	indexCount += 1;
-	if ([titleArray count] <= indexCount) {
+	if ([dataArray count] <= indexCount) {
 		indexCount = 0;
 	}
 	[nextButton	setTitle:[NSString stringWithFormat:@"Center Element %d", indexCount]
@@ -178,8 +211,8 @@ int indexCount;
 
 - (void)reloadButtonTapped:(id)sender {
 	// change our title array so we can see a change
-	if ([titleArray count] > 1) {
-		[titleArray removeLastObject];
+	if ([dataArray count] > 1) {
+		[dataArray removeLastObject];
 	}
 
 	[pickerView reloadData];
@@ -187,22 +220,15 @@ int indexCount;
 
 #pragma mark - HorizontalPickerView DataSource Methods
 - (NSInteger)numberOfElementsInHorizontalPickerView:(V8HorizontalPickerView *)picker {
-	return [titleArray count];
+    return [dataArray count];
 }
 
 #pragma mark - HorizontalPickerView Delegate Methods
 - (NSString *)horizontalPickerView:(V8HorizontalPickerView *)picker titleForElementAtIndex:(NSInteger)index {
-	return [titleArray objectAtIndex:index];
+	TTItem * item = [dataArray objectAtIndex:index];
+    return item.itemName;
 }
 
-- (NSInteger) horizontalPickerView:(V8HorizontalPickerView *)picker widthForElementAtIndex:(NSInteger)index {
-	CGSize constrainedSize = CGSizeMake(MAXFLOAT, MAXFLOAT);
-	NSString *text = [titleArray objectAtIndex:index];
-	CGSize textSize = [text sizeWithFont:[UIFont boldSystemFontOfSize:14.0f]
-					   constrainedToSize:constrainedSize
-						   lineBreakMode:UILineBreakModeWordWrap];
-	return textSize.width + 40.0f; // 20px padding on each side
-}
 
 - (void)horizontalPickerView:(V8HorizontalPickerView *)picker didSelectElementAtIndex:(NSInteger)index {
 	self.infoLabel.text = [NSString stringWithFormat:@"Selected index %d", index];
