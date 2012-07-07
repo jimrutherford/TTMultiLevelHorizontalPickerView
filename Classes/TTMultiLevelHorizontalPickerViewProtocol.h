@@ -1,40 +1,40 @@
 //
-//  V8HorizontalPickerViewProtocol.h
+//  TTMultiLevelHorizontalPickerViewProtocol.h
 //
-//  Created by Shawn Veader on 9/17/10.
-//  Copyright 2010 V8 Labs, LLC. All rights reserved.
+//  Created by Jim Rutherford on 7/7/12.
+//  Copyright 2012 Braxio Interactive. All rights reserved.
 //
 
-@class V8HorizontalPickerView;
+@class TTMultiLevelHorizontalPickerView;
 
 // ------------------------------------------------------------------
 // V8HorizontalPickerView DataSource Protocol
-@protocol V8HorizontalPickerViewDataSource <NSObject>
+@protocol TTMultiLevelHorizontalPickerViewDataSource <NSObject>
 @required
 // data source is responsible for reporting how many elements there are
-- (NSInteger)numberOfElementsInHorizontalPickerView:(V8HorizontalPickerView *)picker;
+- (NSInteger)numberOfElementsInHorizontalPickerView:(TTMultiLevelHorizontalPickerView *)picker;
 @end
 
 
 // ------------------------------------------------------------------
-// V8HorizontalPickerView Delegate Protocol
-@protocol V8HorizontalPickerViewDelegate <NSObject>
+// TTMultiLevelHorizontalPickerView Delegate Protocol
+@protocol TTMultiLevelHorizontalPickerViewDelegate <NSObject>
 
 @optional
 // delegate callback to notify delegate selected element has changed
-- (void)horizontalPickerView:(V8HorizontalPickerView *)picker didSelectElementAtIndex:(NSInteger)index;
+- (void)multiLevelHorizontalPickerView:(TTMultiLevelHorizontalPickerView *)picker didSelectElementAtIndex:(NSInteger)index;
 
 // one of these two methods must be defined
-- (NSString *)horizontalPickerView:(V8HorizontalPickerView *)picker titleForElementAtIndex:(NSInteger)index;
-- (NSArray *)horizontalPickerView:(V8HorizontalPickerView *)picker childrenForElementAtIndex:(NSInteger)index;
-- (UIView *)horizontalPickerView:(V8HorizontalPickerView *)picker viewForElementAtIndex:(NSInteger)index;
-// any view returned from this must confirm to the V8HorizontalPickerElementState protocol
+- (NSString *)multiLevelHorizontalPickerView:(TTMultiLevelHorizontalPickerView *)picker titleForElementAtIndex:(NSInteger)index;
+- (NSArray *)multiLevelHorizontalPickerView:(TTMultiLevelHorizontalPickerView *)picker childrenForElementAtIndex:(NSInteger)index;
+- (UIView *)multiLevelHorizontalPickerView:(TTMultiLevelHorizontalPickerView *)picker viewForElementAtIndex:(NSInteger)index;
+// any view returned from this must confirm to the TTMultiLevelHorizontalPickerElementState protocol
 
 @end
 
 // ------------------------------------------------------------------
-// V8HorizontalPickerElementState Protocol
-@protocol V8HorizontalPickerElementState <NSObject>
+// TTMultiLevelHorizontalPickerElementState Protocol
+@protocol TTMultiLevelHorizontalPickerElementState <NSObject>
 @required
 // element views should know how display themselves based on selected status
 - (void)setSelectedElement:(BOOL)selected;

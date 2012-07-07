@@ -1,15 +1,15 @@
 //
 //  V8HorizontalPickerView.m
 //
-//  Created by Shawn Veader on 9/17/10.
-//  Copyright 2010 V8 Labs, LLC. All rights reserved.
+//  Created by Jim Rutherford on 7/7/12.
+//  Copyright 2012 Braxio Interactive. All rights reserved.
 //
 
-#import "V8HorizontalPickerView.h"
+#import "TTMultiLevelHorizontalPickerView.h"
 
 
 #pragma mark - Internal Method Interface
-@interface V8HorizontalPickerView () {
+@interface TTMultiLevelHorizontalPickerView () {
 	UIScrollView *_scrollView;
 
 	NSInteger elementPadding;
@@ -54,7 +54,7 @@
 
 
 #pragma mark - Implementation
-@implementation V8HorizontalPickerView : UIView
+@implementation TTMultiLevelHorizontalPickerView : UIView
 
 @synthesize dataSource, delegate;
 @synthesize numberOfElements, currentSelectedIndex; // readonly
@@ -106,8 +106,8 @@
 		[self setTotalWidthOfScrollContent];
 	}
 
-	SEL titleForElementSelector = @selector(horizontalPickerView:titleForElementAtIndex:);
-    SEL childrenForElementSelector = @selector(horizontalPickerView:childrenForElementAtIndex:);
+	SEL titleForElementSelector = @selector(multiLevelHorizontalPickerView:titleForElementAtIndex:);
+    SEL childrenForElementSelector = @selector(multiLevelHorizontalPickerView:childrenForElementAtIndex:);
 	SEL setSelectedSelector     = @selector(setSelectedElement:);
 
 	CGRect visibleBounds   = [self bounds];
@@ -150,7 +150,7 @@
 		if (!view) {
 			if (i < numberOfElements) { // make sure we are not requesting data out of range
 				if (self.delegate && [self.delegate respondsToSelector:titleForElementSelector]) {
-					NSString *title = [self.delegate horizontalPickerView:self titleForElementAtIndex:i];
+					NSString *title = [self.delegate multiLevelHorizontalPickerView:self titleForElementAtIndex:i];
 					view = [self labelForForElementAtIndex:i withTitle:title];
                     // use the index as the tag so we can find it later
 					view.tag = [self tagForElementAtIndex:i];
@@ -161,13 +161,12 @@
     
     
         // draw sub elements
-        NSArray * subElements = [self.delegate horizontalPickerView:self childrenForElementAtIndex:i];   
+        NSArray * subElements = [self.delegate multiLevelHorizontalPickerView:self childrenForElementAtIndex:i];   
         NSInteger numberOfSubElements = [subElements count];
         NSLog(@"number of sub elements ==> %d", numberOfSubElements);
     
         int interval; 
-        if (numberOfSubElements < 2) 
-        {
+        if (numberOfSubElements < 2) {
             interval = elementWidth / 2;
             numberOfSubElements = 1;
 
@@ -176,7 +175,7 @@
             interval = elementWidth / (numberOfSubElements + 1);
         }
     
-    int location = interval;
+        int location = interval;
     for (int j = 0; j < numberOfSubElements; j++)
     {
         UIView *subLineView = [[UIView alloc] initWithFrame:CGRectMake(i * elementWidth + location, 0, 1, 30)];
@@ -298,9 +297,9 @@
 	[_scrollView setContentOffset:CGPointMake(x, 0) animated:animate];
 
 	// notify delegate of the selected index
-	SEL delegateCall = @selector(horizontalPickerView:didSelectElementAtIndex:);
+	SEL delegateCall = @selector(multiLevelHorizontalPickerView:didSelectElementAtIndex:);
 	if (self.delegate && [self.delegate respondsToSelector:delegateCall]) {
-		[self.delegate horizontalPickerView:self didSelectElementAtIndex:index];
+		[self.delegate multiLevelHorizontalPickerView:self didSelectElementAtIndex:index];
 	}
 
 #if (__IPHONE_OS_VERSION_MAX_ALLOWED > __IPHONE_4_3)

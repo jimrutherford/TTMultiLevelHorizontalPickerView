@@ -2,8 +2,8 @@
 //  TestViewController.m
 //  fStats
 //
-//  Created by Shawn Veader on 9/18/10.
-//  Copyright 2010 V8 Labs, LLC. All rights reserved.
+//  Created by Jim Rutherford on 7/7/12.
+//  Copyright 2012 Braxio Interactive. All rights reserved.
 //
 
 #import "TestViewController.h"
@@ -88,7 +88,7 @@ int indexCount;
 //	CGFloat x = (self.view.frame.size.width - width) / 2.0f;
 //	CGRect tmpFrame = CGRectMake(x, 150.0f, width, 40.0f);
 
-	pickerView = [[V8HorizontalPickerView alloc] initWithFrame:tmpFrame];
+	pickerView = [[TTMultiLevelHorizontalPickerView alloc] initWithFrame:tmpFrame];
 	pickerView.backgroundColor   = [UIColor darkGrayColor];
 	pickerView.selectedTextColor = [UIColor whiteColor];
 	pickerView.textColor   = [UIColor grayColor];
@@ -222,22 +222,22 @@ int indexCount;
 }
 
 #pragma mark - HorizontalPickerView DataSource Methods
-- (NSInteger)numberOfElementsInHorizontalPickerView:(V8HorizontalPickerView *)picker {
+- (NSInteger)numberOfElementsInHorizontalPickerView:(TTMultiLevelHorizontalPickerView *)picker {
     return [dataArray count];
 }
 
-#pragma mark - HorizontalPickerView Delegate Methods
-- (NSString *)horizontalPickerView:(V8HorizontalPickerView *)picker titleForElementAtIndex:(NSInteger)index {
+#pragma mark - MultiLevelHorizontalPickerView Delegate Methods
+- (NSString *)multiLevelHorizontalPickerView:(TTMultiLevelHorizontalPickerView *)picker titleForElementAtIndex:(NSInteger)index {
 	TTItem * item = [dataArray objectAtIndex:index];
     return item.itemName;
 }
 
-- (NSArray *)horizontalPickerView:(V8HorizontalPickerView *)picker childrenForElementAtIndex:(NSInteger)index {
+- (NSArray *)multiLevelHorizontalPickerView:(TTMultiLevelHorizontalPickerView *)picker childrenForElementAtIndex:(NSInteger)index {
 	TTItem * item = [dataArray objectAtIndex:index];
     return item.items;
 }
 
-- (void)horizontalPickerView:(V8HorizontalPickerView *)picker didSelectElementAtIndex:(NSInteger)index {
+- (void)multiLevelHorizontalPickerView:(TTMultiLevelHorizontalPickerView *)picker didSelectElementAtIndex:(NSInteger)index {
 	self.infoLabel.text = [NSString stringWithFormat:@"Selected index %d", index];
 }
 

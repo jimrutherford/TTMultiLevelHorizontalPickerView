@@ -2,8 +2,8 @@
 //  HorzPickerTestAppAppDelegate.h
 //  HorzPickerTestApp
 //
-//  Created by Shawn Veader on 9/20/10.
-//  Copyright 2010 V8 Labs, LLC. All rights reserved.
+//  Created by Jim Rutherford on 7/7/12.
+//  Copyright 2012 Braxio Interactive. All rights reserved.
 //
 
 #import <UIKit/UIKit.h>
