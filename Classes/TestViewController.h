@@ -10,7 +10,7 @@
 #import "TTMultiLevelHorizontalPickerViewProtocol.h"
 #import "TTMultiLevelHorizontalPickerView.h"
 
-@class V8HorizontalPickerView;
+@class TTMultiLevelHorizontalPickerView;
 
 @interface TestViewController : UIViewController <TTMultiLevelHorizontalPickerViewDelegate, TTMultiLevelHorizontalPickerViewDataSource> { }
 

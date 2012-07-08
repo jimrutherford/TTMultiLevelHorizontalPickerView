@@ -1,5 +1,5 @@
 //
-//  HorzPickerTestAppAppDelegate.m
+//  AppDelegate.m
 //  HorzPickerTestApp
 //
 //  Created by Jim Rutherford on 7/7/12.
@@ -7,9 +7,9 @@
 //
 
 #import "TestViewController.h"
-#import "HorzPickerTestAppAppDelegate.h"
+#import "AppDelegate.h"
 
-@implementation HorzPickerTestAppAppDelegate
+@implementation AppDelegate
 
 @synthesize window;
 @synthesize testView;

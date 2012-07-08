@@ -1,5 +1,5 @@
 //
-//  HorzPickerTestAppAppDelegate.h
+//  AppDelegate.h
 //  HorzPickerTestApp
 //
 //  Created by Jim Rutherford on 7/7/12.
@@ -8,7 +8,7 @@
 
 #import <UIKit/UIKit.h>
 
-@interface HorzPickerTestAppAppDelegate : NSObject <UIApplicationDelegate> { }
+@interface AppDelegate : NSObject <UIApplicationDelegate> { }
 
 @property (nonatomic, retain) IBOutlet UIWindow *window;
 @property (nonatomic, retain) TestViewController *testView;

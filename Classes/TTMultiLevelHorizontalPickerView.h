@@ -10,9 +10,9 @@
 
 // position of indicator view, if shown
 typedef enum {
-	V8HorizontalPickerIndicatorBottom = 0,
-	V8HorizontalPickerIndicatorTop	
-} V8HorizontalPickerIndicatorPosition;
+    PickerIndicatorBottom = 0,
+	PickerIndicatorTop	
+} PickerIndicatorPosition;
 
 
 
@@ -36,7 +36,7 @@ typedef enum {
 @property (nonatomic, assign) CGPoint selectionPoint;
 @property (nonatomic, retain) UIView *selectionIndicatorView;
 
-@property (nonatomic, assign) V8HorizontalPickerIndicatorPosition indicatorPosition;
+@property (nonatomic, assign) PickerIndicatorPosition indicatorPosition;
 
 - (void)reloadData;
 - (void)scrollToElement:(NSInteger)index animated:(BOOL)animate;
@@ -45,7 +45,7 @@ typedef enum {
 
 
 // sub-class of UILabel that knows how to change it's state
-@interface V8HorizontalPickerLabel : UILabel <TTMultiLevelHorizontalPickerElementState> { }
+@interface PickerLabel : UILabel <TTMultiLevelHorizontalPickerElementState> { }
 
 @property (nonatomic, assign) BOOL selectedElement;
 @property (nonatomic, retain) UIColor *selectedStateColor;

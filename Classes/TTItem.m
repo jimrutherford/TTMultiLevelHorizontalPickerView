@@ -2,8 +2,8 @@
 //  TTItem.m
 //  HorzPickerTestApp
 //
-//  Created by James Rutherford on 12-06-27.
-//  Copyright (c) 2012 V8 Labs, LLC. All rights reserved.
+//  Created by James Rutherford on 7-7-12.
+//  Copyright (c) 2012 Braxio Interacitve. All rights reserved.
 //
 
 #import "TTItem.h"

@@ -1,6 +1,5 @@
-    //
+//
 //  TestViewController.m
-//  fStats
 //
 //  Created by Jim Rutherford on 7/7/12.
 //  Copyright 2012 Braxio Interactive. All rights reserved.
@@ -100,7 +99,7 @@ int indexCount;
 	// add carat or other view to indicate selected element
 	UIImageView *indicator = [[UIImageView alloc] initWithImage:[UIImage imageNamed:@"indicator"]];
 	pickerView.selectionIndicatorView = indicator;
-//	pickerView.indicatorPosition = V8HorizontalPickerIndicatorTop; // specify indicator's location
+//	pickerView.indicatorPosition = PickerIndicatorTop; // specify indicator's location
 
 	[self.view addSubview:pickerView];
 

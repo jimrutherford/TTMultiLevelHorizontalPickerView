@@ -1,5 +1,5 @@
 //
-//  V8HorizontalPickerView.m
+//  TTMultiLevelHorizontalPickerView.m
 //
 //  Created by Jim Rutherford on 7/7/12.
 //  Copyright 2012 Braxio Interactive. All rights reserved.
@@ -34,7 +34,7 @@
 
 - (void)addScrollView;
 - (void)drawPositionIndicator;
-- (V8HorizontalPickerLabel *)labelForForElementAtIndex:(NSInteger)index withTitle:(NSString *)title;
+- (PickerLabel *)labelForForElementAtIndex:(NSInteger)index withTitle:(NSString *)title;
 - (CGRect)frameForElementAtIndex:(NSInteger)index;
 
 - (CGPoint)currentCenter;
@@ -82,7 +82,7 @@
 
 		// default to the center
 		selectionPoint = CGPointMake(frame.size.width / 2, 0.0f);
-		indicatorPosition = V8HorizontalPickerIndicatorBottom;
+		indicatorPosition = PickerIndicatorBottom;
 
 		firstVisibleElement = -1;
 		lastVisibleElement  = -1;
@@ -129,8 +129,8 @@
 					int currentIndex = [self nearestElementToCenter];
 					isSelected = (currentIndex == currentSelectedIndex);
 				}
-				// casting to V8HorizontalPickerLabel so we can call this without all the NSInvocation jazz
-				[(V8HorizontalPickerLabel *)view setSelectedElement:isSelected];
+				// casting to PickerLabel so we can call this without all the NSInvocation jazz
+				[(PickerLabel *)view setSelectedElement:isSelected];
 			}
 		}
 	}
@@ -237,7 +237,7 @@
 	// TODO: set all subviews as well?
 }
 
-- (void)setIndicatorPosition:(V8HorizontalPickerIndicatorPosition)position {
+- (void)setIndicatorPosition:(PickerIndicatorPosition)position {
 	if (indicatorPosition != position) {
 		indicatorPosition = position;
 		[self drawPositionIndicator];
@@ -378,11 +378,11 @@
 	CGFloat y;
 
 	switch (self.indicatorPosition) {
-		case V8HorizontalPickerIndicatorTop: {
+		case PickerIndicatorTop: {
 			y = 0.0f;
 			break;
 		}
-		case V8HorizontalPickerIndicatorBottom: {
+		case PickerIndicatorBottom: {
 			y = self.frame.size.height - indicatorFrame.size.height;
 			break;
 		}
@@ -397,9 +397,9 @@
 }
 
 // create a UILabel for this element.
-- (V8HorizontalPickerLabel *)labelForForElementAtIndex:(NSInteger)index withTitle:(NSString *)title {
+- (PickerLabel *)labelForForElementAtIndex:(NSInteger)index withTitle:(NSString *)title {
 	CGRect labelFrame     = [self frameForElementAtIndex:index];
-	V8HorizontalPickerLabel *elementLabel = [[V8HorizontalPickerLabel alloc] initWithFrame:labelFrame];
+	PickerLabel *elementLabel = [[PickerLabel alloc] initWithFrame:labelFrame];
 
 	elementLabel.textAlignment   = UITextAlignmentCenter;
 	elementLabel.backgroundColor = self.backgroundColor;
@@ -592,7 +592,7 @@
 
 // ------------------------------------------------------------------------
 #pragma mark - Picker Label Implementation
-@implementation V8HorizontalPickerLabel : UILabel
+@implementation PickerLabel : UILabel
 
 @synthesize selectedElement, selectedStateColor, normalStateColor;
 

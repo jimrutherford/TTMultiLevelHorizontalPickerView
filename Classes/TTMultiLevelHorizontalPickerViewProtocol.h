@@ -8,7 +8,7 @@
 @class TTMultiLevelHorizontalPickerView;
 
 // ------------------------------------------------------------------
-// V8HorizontalPickerView DataSource Protocol
+// TTMultiLevelHorizontalPickerView DataSource Protocol
 @protocol TTMultiLevelHorizontalPickerViewDataSource <NSObject>
 @required
 // data source is responsible for reporting how many elements there are
