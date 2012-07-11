@@ -23,7 +23,8 @@ typedef enum {
 @property (nonatomic, assign) id <TTMultiLevelHorizontalPickerViewDelegate> delegate;
 
 @property (nonatomic, readonly) NSInteger numberOfElements;
-@property (nonatomic, readonly) NSInteger currentSelectedIndex;
+@property (nonatomic, readonly) NSInteger currentMajorSelectedIndex;
+@property (nonatomic, readonly) NSInteger currentMinorSelectedIndex;
 
 // what font to use for the element labels?
 @property (nonatomic, retain) UIFont *elementFont;
@@ -39,8 +40,8 @@ typedef enum {
 @property (nonatomic, assign) PickerIndicatorPosition indicatorPosition;
 
 - (void)reloadData;
-- (void)scrollToElement:(NSInteger)index animated:(BOOL)animate;
-
+- (void)scrollToMajorElement:(NSInteger)index animated:(BOOL)animate;
+- (void)scrollToMinorElement:(NSInteger)index withMajorElement: (NSInteger) majorIndex animated:(BOOL)animate;
 @end
 
 

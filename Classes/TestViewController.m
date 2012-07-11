@@ -139,7 +139,7 @@ int indexCount;
 
 - (void)viewWillAppear:(BOOL)animated {
 	[super viewWillAppear:animated];
-	[pickerView scrollToElement:0 animated:NO];
+	[pickerView scrollToMajorElement:0 animated:NO];
 }
 
 - (BOOL)shouldAutorotateToInterfaceOrientation:(UIInterfaceOrientation)interfaceOrientation {
@@ -202,7 +202,7 @@ int indexCount;
 
 #pragma mark - Button Tap Handlers
 - (void)nextButtonTapped:(id)sender {
-	[pickerView scrollToElement:indexCount animated:NO];
+	[pickerView scrollToMajorElement:indexCount animated:NO];
 	indexCount += 1;
 	if ([dataArray count] <= indexCount) {
 		indexCount = 0;

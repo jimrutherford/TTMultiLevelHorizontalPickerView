@@ -57,7 +57,7 @@
 @implementation TTMultiLevelHorizontalPickerView : UIView
 
 @synthesize dataSource, delegate;
-@synthesize numberOfElements, currentSelectedIndex; // readonly
+@synthesize numberOfElements, currentMajorSelectedIndex, currentMinorSelectedIndex; // readonly
 @synthesize elementFont, textColor, selectedTextColor;
 @synthesize selectionPoint, selectionIndicatorView, indicatorPosition;
 
@@ -70,7 +70,7 @@
 		self.textColor   = [UIColor blackColor];
 		self.elementFont = [UIFont systemFontOfSize:12.0f];
 
-		currentSelectedIndex = -1; // nothing is selected yet
+		currentMajorSelectedIndex = -1; // nothing is selected yet
         
         elementWidth = 100;
         
@@ -123,11 +123,11 @@
 		} else { // if it is still visible, update it's selected state
 			if ([view respondsToSelector:setSelectedSelector]) {
 				// view's tag is it's index
-				BOOL isSelected = (currentSelectedIndex == [self indexForElement:view]);
+				BOOL isSelected = (currentMajorSelectedIndex == [self indexForElement:view]);
 				if (isSelected) {
 					// if this view is set to be selected, make sure it is over the selection point
 					int currentIndex = [self nearestElementToCenter];
-					isSelected = (currentIndex == currentSelectedIndex);
+					isSelected = (currentIndex == currentMajorSelectedIndex);
 				}
 				// casting to PickerLabel so we can call this without all the NSInvocation jazz
 				[(PickerLabel *)view setSelectedElement:isSelected];
@@ -196,13 +196,13 @@
 	lastVisibleElement  = lastNeededElement;
 
 	// determine if scroll view needs to shift in response to resizing?
-	if (currentSelectedIndex > -1 && [self centerOfElementAtIndex:currentSelectedIndex] != [self currentCenter].x) {
+	if (currentMajorSelectedIndex > -1 && [self centerOfElementAtIndex:currentMajorSelectedIndex] != [self currentCenter].x) {
 		if (adjustWhenFinished) {
-			[self scrollToElement:currentSelectedIndex animated:NO];
-		} else if (numberOfElements <= currentSelectedIndex) {
+			[self scrollToMajorElement:currentMajorSelectedIndex animated:NO];
+		} else if (numberOfElements <= currentMajorSelectedIndex) {
 			// if currentSelectedIndex no longer exists, select what is currently centered
-			currentSelectedIndex = [self nearestElementToCenter];
-			[self scrollToElement:currentSelectedIndex animated:NO];
+			currentMajorSelectedIndex = [self nearestElementToCenter];
+			[self scrollToMajorElement:currentMajorSelectedIndex animated:NO];
 		}
 	}
 }
@@ -291,8 +291,8 @@
 
 
 #pragma mark - Scroll To Element Method
-- (void)scrollToElement:(NSInteger)index animated:(BOOL)animate {
-	currentSelectedIndex = index;
+- (void)scrollToMajorElement:(NSInteger)index animated:(BOOL)animate {
+	currentMajorSelectedIndex = index;
 	int x = [self centerOfElementAtIndex:index] - selectionPoint.x;
 	[_scrollView setContentOffset:CGPointMake(x, 0) animated:animate];
 
@@ -307,6 +307,22 @@
 #endif
 }
 
+#pragma mark - Scroll To Element Method
+- (void)scrollToMinorElement:(NSInteger)index withMajorElement:(NSInteger) majorIndex animated:(BOOL)animate {
+	currentMajorSelectedIndex = index;
+	int x = [self centerOfElementAtIndex:index] - selectionPoint.x;
+	[_scrollView setContentOffset:CGPointMake(x, 0) animated:animate];
+    
+	// notify delegate of the selected index
+	SEL delegateCall = @selector(multiLevelHorizontalPickerView:didSelectElementAtIndex:);
+	if (self.delegate && [self.delegate respondsToSelector:delegateCall]) {
+		[self.delegate multiLevelHorizontalPickerView:self didSelectElementAtIndex:index];
+	}
+    
+#if (__IPHONE_OS_VERSION_MAX_ALLOWED > __IPHONE_4_3)
+	[self setNeedsLayout];
+#endif
+}
 
 #pragma mark - UIScrollViewDelegate Methods
 - (void)scrollViewDidScroll:(UIScrollView *)scrollView {
@@ -316,7 +332,7 @@
 		//		 cases so that the view state is properly preserved.
 
 		// set the current item under the center to "highlighted" or current
-		currentSelectedIndex = [self nearestElementToCenter];
+		currentMajorSelectedIndex = [self nearestElementToCenter];
 	}
 
 #if (__IPHONE_OS_VERSION_MAX_ALLOWED > __IPHONE_4_3)
@@ -411,7 +427,7 @@
 
 	// show selected status if this element is the selected one and is currently over selectionPoint
 	int currentIndex = [self nearestElementToCenter];
-	elementLabel.selectedElement = (currentSelectedIndex == index) && (currentIndex == currentSelectedIndex);
+	elementLabel.selectedElement = (currentMajorSelectedIndex == index) && (currentIndex == currentMajorSelectedIndex);
 
 	return elementLabel;
 }
@@ -570,7 +586,7 @@
 
 // move scroll view to position nearest element under the center
 - (void)scrollToElementNearestToCenter {
-	[self scrollToElement:[self nearestElementToCenter] animated:YES];
+	[self scrollToMajorElement:[self nearestElementToCenter] animated:YES];
 }
 
 
@@ -581,7 +597,7 @@
 		CGPoint tapLocation    = [recognizer locationInView:_scrollView];
 		NSInteger elementIndex = [self elementContainingPoint:tapLocation];
 		if (elementIndex != -1) { // point not in element
-			[self scrollToElement:elementIndex animated:YES];
+			[self scrollToMajorElement:elementIndex animated:YES];
 		}
 	}
 }
