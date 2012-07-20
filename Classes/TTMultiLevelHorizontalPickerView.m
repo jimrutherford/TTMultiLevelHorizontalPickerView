@@ -39,8 +39,13 @@
 
 - (CGPoint)currentCenter;
 - (void)scrollToElementNearestToCenter;
-- (NSInteger)nearestElementToCenter;
-- (NSInteger)nearestElementToPoint:(CGPoint)point;
+
+- (NSInteger)nearestMajorElementToCenter;
+- (NSInteger)nearestMajorElementToPoint:(CGPoint)point;
+
+- (NSInteger)nearestMinorElementToCenterWithMajorIndex:(NSInteger)majorIndex;
+- (NSInteger)nearestMinorElementToPoint:(CGPoint)point withMajorIndex:(NSInteger)majorIndex;
+
 - (NSInteger)elementContainingPoint:(CGPoint)point;
 
 - (NSInteger)offsetForElementAtIndex:(NSInteger)index;
@@ -107,7 +112,7 @@
 	}
 
 	SEL titleForElementSelector = @selector(multiLevelHorizontalPickerView:titleForElementAtIndex:);
-    SEL childrenForElementSelector = @selector(multiLevelHorizontalPickerView:childrenForElementAtIndex:);
+    //SEL childrenForElementSelector = @selector(multiLevelHorizontalPickerView:childrenForElementAtIndex:);
 	SEL setSelectedSelector     = @selector(setSelectedElement:);
 
 	CGRect visibleBounds   = [self bounds];
@@ -126,7 +131,7 @@
 				BOOL isSelected = (currentMajorSelectedIndex == [self indexForElement:view]);
 				if (isSelected) {
 					// if this view is set to be selected, make sure it is over the selection point
-					int currentIndex = [self nearestElementToCenter];
+					int currentIndex = [self nearestMajorElementToCenter];
 					isSelected = (currentIndex == currentMajorSelectedIndex);
 				}
 				// casting to PickerLabel so we can call this without all the NSInvocation jazz
@@ -139,8 +144,8 @@
     
 	// find needed elements by looking at left and right edges of frame
 	CGPoint offset = _scrollView.contentOffset;
-	int firstNeededElement = [self nearestElementToPoint:CGPointMake(offset.x, 0.0f)];
-	int lastNeededElement  = [self nearestElementToPoint:CGPointMake(offset.x + visibleBounds.size.width, 0.0f)];
+	int firstNeededElement = [self nearestMajorElementToPoint:CGPointMake(offset.x, 0.0f)];
+	int lastNeededElement  = [self nearestMajorElementToPoint:CGPointMake(offset.x + visibleBounds.size.width, 0.0f)];
 
 	// add any views that have become visible
 	UIView *view = nil;
@@ -201,7 +206,7 @@
 			[self scrollToMajorElement:currentMajorSelectedIndex animated:NO];
 		} else if (numberOfElements <= currentMajorSelectedIndex) {
 			// if currentSelectedIndex no longer exists, select what is currently centered
-			currentMajorSelectedIndex = [self nearestElementToCenter];
+			currentMajorSelectedIndex = [self nearestMajorElementToCenter];
 			[self scrollToMajorElement:currentMajorSelectedIndex animated:NO];
 		}
 	}
@@ -271,7 +276,7 @@
 	elementLabel.selectedStateColor = self.selectedTextColor;
     
 	// show selected status if this element is the selected one and is currently over selectionPoint
-	int currentIndex = [self nearestElementToCenter];
+	int currentIndex = [self nearestMajorElementToCenter];
 	elementLabel.selectedElement = (currentMajorSelectedIndex == index) && (currentIndex == currentMajorSelectedIndex);
     
 	return elementLabel;
@@ -319,7 +324,7 @@
 		//		 cases so that the view state is properly preserved.
 
 		// set the current item under the center to "highlighted" or current
-		currentMajorSelectedIndex = [self nearestElementToCenter];
+		currentMajorSelectedIndex = [self nearestMajorElementToCenter];
 	}
 
 #if (__IPHONE_OS_VERSION_MAX_ALLOWED > __IPHONE_4_3)
@@ -450,12 +455,12 @@
 }
 
 // what is the element nearest to the center of the view?
-- (NSInteger)nearestElementToCenter {
-	return [self nearestElementToPoint:[self currentCenter]];
+- (NSInteger)nearestMajorElementToCenter {
+	return [self nearestMajorElementToPoint:[self currentCenter]];
 }
 
 // what is the element nearest to the given point?
-- (NSInteger)nearestElementToPoint:(CGPoint)point {
+- (NSInteger)nearestMajorElementToPoint:(CGPoint)point {
 	for (int i = 0; i < numberOfElements; i++) {
 		CGRect frame = [self frameForElementAtIndex:i];
 		if (CGRectContainsPoint(frame, point)) {
@@ -490,9 +495,49 @@
 	return -1;
 }
 
+
+// what is the element nearest to the center of the view?
+- (NSInteger)nearestMinorElementToCenterWithMajorIndex:(NSInteger)majorIndex {
+	return [self nearestMinorElementToPoint:[self currentCenter] withMajorIndex:majorIndex];
+}
+
+// what is the element nearest to the given point?
+- (NSInteger)nearestMinorElementToPoint:(CGPoint)point withMajorIndex:(NSInteger)majorIndex  {
+	for (int i = 0; i < numberOfElements; i++) {
+		CGRect frame = [self frameForElementAtIndex:i];
+		if (CGRectContainsPoint(frame, point)) {
+			return i;
+		} else if (point.x < frame.origin.x) {
+			// if the center is before this element, go back to last one,
+			//     unless we're at the beginning
+			if (i > 0) {
+				return i - 1;
+			} else {
+				return 0;
+			}
+			break;
+		} else if (point.x > frame.origin.y) {
+			// if the center is past the last element, scroll to it
+			if (i == numberOfElements - 1) {
+				return i;
+			}
+		}
+	}
+	return 0;
+}
+
+
+
 // move scroll view to position nearest element under the center
 - (void)scrollToElementNearestToCenter {
-	[self scrollToMajorElement:[self nearestElementToCenter] animated:YES];
+	
+    
+    int majorIndex = [self nearestMajorElementToCenter];
+    int minorIndex = [self nearestMinorElementToCenterWithMajorIndex:majorIndex];
+    
+    
+    //[self scrollToMajorElement:majorIndex animated:YES];
+    [self scrollToMinorElement:minorIndex withMajorElement:minorIndex  animated:YES];
 }
 
 
