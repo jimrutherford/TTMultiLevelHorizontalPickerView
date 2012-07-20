@@ -207,86 +207,74 @@
 	}
 }
 
-
-#pragma mark - Getters and Setters
-- (void)setDelegate:(id)newDelegate {
-	if (delegate != newDelegate) {
-		delegate = newDelegate;
-		[self collectData];
+#pragma mark - View Creation Methods (Internal Methods)
+- (void)addScrollView {
+	if (_scrollView == nil) {
+		_scrollView = [[UIScrollView alloc] initWithFrame:self.bounds];
+		_scrollView.delegate = self;
+		_scrollView.scrollEnabled = YES;
+		_scrollView.scrollsToTop  = NO;
+		_scrollView.showsVerticalScrollIndicator   = NO;
+		_scrollView.showsHorizontalScrollIndicator = NO;
+		_scrollView.bouncesZoom  = NO;
+		_scrollView.alwaysBounceHorizontal = YES;
+		_scrollView.alwaysBounceVertical   = NO;
+		_scrollView.minimumZoomScale = 1.0; // setting min/max the same disables zooming
+		_scrollView.maximumZoomScale = 1.0;
+		_scrollView.contentInset = UIEdgeInsetsZero;
+		_scrollView.decelerationRate = 0.1; //UIScrollViewDecelerationRateNormal;
+		_scrollView.autoresizingMask = UIViewAutoresizingFlexibleHeight | UIViewAutoresizingFlexibleWidth;
+		_scrollView.autoresizesSubviews = YES;
+        
+		UITapGestureRecognizer *tapRecognizer = [[UITapGestureRecognizer alloc] initWithTarget:self action:@selector(scrollViewTapped:)];
+		[_scrollView addGestureRecognizer:tapRecognizer];
+        
+		[self addSubview:_scrollView];
 	}
 }
 
-- (void)setDataSource:(id)newDataSource {
-	if (dataSource != newDataSource) {
-		dataSource = newDataSource;
-		[self collectData];
-	}
-}
-
-- (void)setSelectionPoint:(CGPoint)point {
-	if (!CGPointEqualToPoint(point, selectionPoint)) {
-		selectionPoint = point;
-		[self updateScrollContentInset];
-	}
-}
-
-// allow the setting of this views background color to change the scroll view
-- (void)setBackgroundColor:(UIColor *)newColor {
-	[super setBackgroundColor:newColor];
-	_scrollView.backgroundColor = newColor;
-	// TODO: set all subviews as well?
-}
-
-- (void)setIndicatorPosition:(PickerIndicatorPosition)position {
-	if (indicatorPosition != position) {
-		indicatorPosition = position;
-		[self drawPositionIndicator];
-	}
-}
-
-- (void)setSelectionIndicatorView:(UIView *)indicatorView {
-	if (selectionIndicatorView != indicatorView) {
-		if (selectionIndicatorView) {
-			[selectionIndicatorView removeFromSuperview];
+- (void)drawPositionIndicator {
+	CGRect indicatorFrame = selectionIndicatorView.frame;
+	CGFloat x = self.selectionPoint.x - (indicatorFrame.size.width / 2);
+	CGFloat y;
+    
+	switch (self.indicatorPosition) {
+		case PickerIndicatorTop: {
+			y = 0.0f;
+			break;
 		}
-		selectionIndicatorView = indicatorView;
-
-		[self drawPositionIndicator];
+		case PickerIndicatorBottom: {
+			y = self.frame.size.height - indicatorFrame.size.height;
+			break;
+		}
+		default:
+			break;
 	}
+    
+	// properly place indicator image in view relative to selection point
+	CGRect tmpFrame = CGRectMake(x, y, indicatorFrame.size.width, indicatorFrame.size.height);
+	selectionIndicatorView.frame = tmpFrame;
+	[self addSubview:selectionIndicatorView];
 }
 
-
-- (void)setFrame:(CGRect)newFrame {
-	if (!CGRectEqualToRect(self.frame, newFrame)) {
-		// causes recalulation of offsets, etc based on new size
-		scrollSizeHasBeenSet = NO;
-	}
-	[super setFrame:newFrame];
-}
-
-#pragma mark - Data Fetching Methods
-- (void)reloadData {
-	// remove all scrollview subviews and "recycle" them
-	for (UIView *view in [_scrollView subviews]) {
-		[view removeFromSuperview];
-	}
-
-	firstVisibleElement = NSIntegerMax;
-	lastVisibleElement  = NSIntegerMin;
-
-	[self collectData];
-}
-
-- (void)collectData {
-	scrollSizeHasBeenSet = NO;
-	dataHasBeenLoaded    = NO;
-
-	[self getNumberOfElementsFromDataSource];
-	[self setTotalWidthOfScrollContent];
-	[self updateScrollContentInset];
-
-	dataHasBeenLoaded = YES;
-	[self setNeedsLayout];
+// create a UILabel for this element.
+- (PickerLabel *)labelForForElementAtIndex:(NSInteger)index withTitle:(NSString *)title {
+	CGRect labelFrame     = [self frameForElementAtIndex:index];
+	PickerLabel *elementLabel = [[PickerLabel alloc] initWithFrame:labelFrame];
+    
+	elementLabel.textAlignment   = UITextAlignmentCenter;
+	elementLabel.backgroundColor = self.backgroundColor;
+	elementLabel.text            = title;
+	elementLabel.font            = self.elementFont;
+    
+	elementLabel.normalStateColor   = self.textColor;
+	elementLabel.selectedStateColor = self.selectedTextColor;
+    
+	// show selected status if this element is the selected one and is currently over selectionPoint
+	int currentIndex = [self nearestElementToCenter];
+	elementLabel.selectedElement = (currentMajorSelectedIndex == index) && (currentIndex == currentMajorSelectedIndex);
+    
+	return elementLabel;
 }
 
 
@@ -307,7 +295,6 @@
 #endif
 }
 
-#pragma mark - Scroll To Element Method
 - (void)scrollToMinorElement:(NSInteger)index withMajorElement:(NSInteger) majorIndex animated:(BOOL)animate {
 	currentMajorSelectedIndex = index;
 	int x = [self centerOfElementAtIndex:index] - selectionPoint.x;
@@ -361,87 +348,6 @@
 	scrollingBasedOnUserInteraction = NO;
 }
 
-
-#pragma mark - View Creation Methods (Internal Methods)
-- (void)addScrollView {
-	if (_scrollView == nil) {
-		_scrollView = [[UIScrollView alloc] initWithFrame:self.bounds];
-		_scrollView.delegate = self;
-		_scrollView.scrollEnabled = YES;
-		_scrollView.scrollsToTop  = NO;
-		_scrollView.showsVerticalScrollIndicator   = NO;
-		_scrollView.showsHorizontalScrollIndicator = NO;
-		_scrollView.bouncesZoom  = NO;
-		_scrollView.alwaysBounceHorizontal = YES;
-		_scrollView.alwaysBounceVertical   = NO;
-		_scrollView.minimumZoomScale = 1.0; // setting min/max the same disables zooming
-		_scrollView.maximumZoomScale = 1.0;
-		_scrollView.contentInset = UIEdgeInsetsZero;
-		_scrollView.decelerationRate = 0.1; //UIScrollViewDecelerationRateNormal;
-		_scrollView.autoresizingMask = UIViewAutoresizingFlexibleHeight | UIViewAutoresizingFlexibleWidth;
-		_scrollView.autoresizesSubviews = YES;
-
-		UITapGestureRecognizer *tapRecognizer = [[UITapGestureRecognizer alloc] initWithTarget:self action:@selector(scrollViewTapped:)];
-		[_scrollView addGestureRecognizer:tapRecognizer];
-
-		[self addSubview:_scrollView];
-	}
-}
-
-- (void)drawPositionIndicator {
-	CGRect indicatorFrame = selectionIndicatorView.frame;
-	CGFloat x = self.selectionPoint.x - (indicatorFrame.size.width / 2);
-	CGFloat y;
-
-	switch (self.indicatorPosition) {
-		case PickerIndicatorTop: {
-			y = 0.0f;
-			break;
-		}
-		case PickerIndicatorBottom: {
-			y = self.frame.size.height - indicatorFrame.size.height;
-			break;
-		}
-		default:
-			break;
-	}
-
-	// properly place indicator image in view relative to selection point
-	CGRect tmpFrame = CGRectMake(x, y, indicatorFrame.size.width, indicatorFrame.size.height);
-	selectionIndicatorView.frame = tmpFrame;
-	[self addSubview:selectionIndicatorView];
-}
-
-// create a UILabel for this element.
-- (PickerLabel *)labelForForElementAtIndex:(NSInteger)index withTitle:(NSString *)title {
-	CGRect labelFrame     = [self frameForElementAtIndex:index];
-	PickerLabel *elementLabel = [[PickerLabel alloc] initWithFrame:labelFrame];
-
-	elementLabel.textAlignment   = UITextAlignmentCenter;
-	elementLabel.backgroundColor = self.backgroundColor;
-	elementLabel.text            = title;
-	elementLabel.font            = self.elementFont;
-
-	elementLabel.normalStateColor   = self.textColor;
-	elementLabel.selectedStateColor = self.selectedTextColor;
-
-	// show selected status if this element is the selected one and is currently over selectionPoint
-	int currentIndex = [self nearestElementToCenter];
-	elementLabel.selectedElement = (currentMajorSelectedIndex == index) && (currentIndex == currentMajorSelectedIndex);
-
-	return elementLabel;
-}
-
-
-#pragma mark - DataSource Calling Method (Internal Method)
-- (void)getNumberOfElementsFromDataSource {
-	SEL dataSourceCall = @selector(numberOfElementsInHorizontalPickerView:);
-	if (self.dataSource && [self.dataSource respondsToSelector:dataSourceCall]) {
-		numberOfElements = [self.dataSource numberOfElementsInHorizontalPickerView:self];
-	} else {
-		numberOfElements = 0;
-	}
-}
 
 
 #pragma mark - View Calculation and Manipulation Methods (Internal Methods)
@@ -601,6 +507,98 @@
 		}
 	}
 }
+
+#pragma mark - Data Fetching Methods
+- (void)reloadData {
+	// remove all scrollview subviews and "recycle" them
+	for (UIView *view in [_scrollView subviews]) {
+		[view removeFromSuperview];
+	}
+    
+	firstVisibleElement = NSIntegerMax;
+	lastVisibleElement  = NSIntegerMin;
+    
+	[self collectData];
+}
+
+- (void)collectData {
+	scrollSizeHasBeenSet = NO;
+	dataHasBeenLoaded    = NO;
+    
+	[self getNumberOfElementsFromDataSource];
+	[self setTotalWidthOfScrollContent];
+	[self updateScrollContentInset];
+    
+	dataHasBeenLoaded = YES;
+	[self setNeedsLayout];
+}
+
+#pragma mark - DataSource Calling Method (Internal Method)
+- (void)getNumberOfElementsFromDataSource {
+	SEL dataSourceCall = @selector(numberOfElementsInHorizontalPickerView:);
+	if (self.dataSource && [self.dataSource respondsToSelector:dataSourceCall]) {
+		numberOfElements = [self.dataSource numberOfElementsInHorizontalPickerView:self];
+	} else {
+		numberOfElements = 0;
+	}
+}
+
+#pragma mark - Getters and Setters
+- (void)setDelegate:(id)newDelegate {
+	if (delegate != newDelegate) {
+		delegate = newDelegate;
+		[self collectData];
+	}
+}
+
+- (void)setDataSource:(id)newDataSource {
+	if (dataSource != newDataSource) {
+		dataSource = newDataSource;
+		[self collectData];
+	}
+}
+
+- (void)setSelectionPoint:(CGPoint)point {
+	if (!CGPointEqualToPoint(point, selectionPoint)) {
+		selectionPoint = point;
+		[self updateScrollContentInset];
+	}
+}
+
+// allow the setting of this views background color to change the scroll view
+- (void)setBackgroundColor:(UIColor *)newColor {
+	[super setBackgroundColor:newColor];
+	_scrollView.backgroundColor = newColor;
+	// TODO: set all subviews as well?
+}
+
+- (void)setIndicatorPosition:(PickerIndicatorPosition)position {
+	if (indicatorPosition != position) {
+		indicatorPosition = position;
+		[self drawPositionIndicator];
+	}
+}
+
+- (void)setSelectionIndicatorView:(UIView *)indicatorView {
+	if (selectionIndicatorView != indicatorView) {
+		if (selectionIndicatorView) {
+			[selectionIndicatorView removeFromSuperview];
+		}
+		selectionIndicatorView = indicatorView;
+        
+		[self drawPositionIndicator];
+	}
+}
+
+
+- (void)setFrame:(CGRect)newFrame {
+	if (!CGRectEqualToRect(self.frame, newFrame)) {
+		// causes recalulation of offsets, etc based on new size
+		scrollSizeHasBeenSet = NO;
+	}
+	[super setFrame:newFrame];
+}
+
 
 @end
 
