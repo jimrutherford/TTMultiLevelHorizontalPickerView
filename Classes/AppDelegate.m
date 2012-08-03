@@ -11,18 +11,14 @@
 
 @implementation AppDelegate
 
-@synthesize window;
-@synthesize testView;
-
-
 #pragma mark - Application lifecycle
 - (BOOL)application:(UIApplication *)application didFinishLaunchingWithOptions:(NSDictionary *)launchOptions {    
     
 	// Override point for customization after application launch.
-	testView = [[TestViewController alloc] init];
-	[window addSubview:testView.view];
+	_testView = [[TestViewController alloc] init];
+	[_window addSubview:_testView.view];
 
-	[window makeKeyAndVisible];
+	[_window makeKeyAndVisible];
 
     return YES;
 }

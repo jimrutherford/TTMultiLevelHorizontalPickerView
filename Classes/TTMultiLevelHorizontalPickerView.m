@@ -61,11 +61,6 @@
 #pragma mark - Implementation
 @implementation TTMultiLevelHorizontalPickerView : UIView
 
-@synthesize dataSource, delegate;
-@synthesize numberOfElements, currentMajorSelectedIndex, currentMinorSelectedIndex; // readonly
-@synthesize elementFont, textColor, selectedTextColor;
-@synthesize selectionPoint, selectionIndicatorView, indicatorPosition;
-
 #pragma mark - Init/Dealloc
 - (id)initWithFrame:(CGRect)frame {
 	if ((self = [super initWithFrame:frame])) {
@@ -75,19 +70,19 @@
 		self.textColor   = [UIColor blackColor];
 		self.elementFont = [UIFont systemFontOfSize:12.0f];
 
-		currentMajorSelectedIndex = -1; // nothing is selected yet
+		_currentMajorSelectedIndex = -1; // nothing is selected yet
         
         elementWidth = 100;
         
-		numberOfElements     = 0;
+		_numberOfElements     = 0;
 		elementPadding       = 0;
 		dataHasBeenLoaded    = NO;
 		scrollSizeHasBeenSet = NO;
 		scrollingBasedOnUserInteraction = NO;
 
 		// default to the center
-		selectionPoint = CGPointMake(frame.size.width / 2, 0.0f);
-		indicatorPosition = PickerIndicatorBottom;
+		_selectionPoint = CGPointMake(frame.size.width / 2, 0.0f);
+		_indicatorPosition = PickerIndicatorBottom;
 
 		firstVisibleElement = -1;
 		lastVisibleElement  = -1;
@@ -128,11 +123,11 @@
 		} else { // if it is still visible, update it's selected state
 			if ([view respondsToSelector:setSelectedSelector]) {
 				// view's tag is it's index
-				BOOL isSelected = (currentMajorSelectedIndex == [self indexForElement:view]);
+				BOOL isSelected = (_currentMajorSelectedIndex == [self indexForElement:view]);
 				if (isSelected) {
 					// if this view is set to be selected, make sure it is over the selection point
 					int currentIndex = [self nearestMajorElementToCenter];
-					isSelected = (currentIndex == currentMajorSelectedIndex);
+					isSelected = (currentIndex == _currentMajorSelectedIndex);
 				}
 				// casting to PickerLabel so we can call this without all the NSInvocation jazz
 				[(PickerLabel *)view setSelectedElement:isSelected];
@@ -153,7 +148,7 @@
 		view = nil; // paranoia
 		view = [_scrollView viewWithTag:[self tagForElementAtIndex:i]];
 		if (!view) {
-			if (i < numberOfElements) { // make sure we are not requesting data out of range
+			if (i < _numberOfElements) { // make sure we are not requesting data out of range
 				if (self.delegate && [self.delegate respondsToSelector:titleForElementSelector]) {
 					NSString *title = [self.delegate multiLevelHorizontalPickerView:self titleForElementAtIndex:i];
 					view = [self labelForForElementAtIndex:i withTitle:title];
@@ -201,13 +196,13 @@
 	lastVisibleElement  = lastNeededElement;
 
 	// determine if scroll view needs to shift in response to resizing?
-	if (currentMajorSelectedIndex > -1 && [self centerOfElementAtIndex:currentMajorSelectedIndex] != [self currentCenter].x) {
+	if (_currentMajorSelectedIndex > -1 && [self centerOfElementAtIndex:_currentMajorSelectedIndex] != [self currentCenter].x) {
 		if (adjustWhenFinished) {
-			[self scrollToMajorElement:currentMajorSelectedIndex animated:NO];
-		} else if (numberOfElements <= currentMajorSelectedIndex) {
+			[self scrollToMajorElement:_currentMajorSelectedIndex animated:NO];
+		} else if (_numberOfElements <= _currentMajorSelectedIndex) {
 			// if currentSelectedIndex no longer exists, select what is currently centered
-			currentMajorSelectedIndex = [self nearestMajorElementToCenter];
-			[self scrollToMajorElement:currentMajorSelectedIndex animated:NO];
+			_currentMajorSelectedIndex = [self nearestMajorElementToCenter];
+			[self scrollToMajorElement:_currentMajorSelectedIndex animated:NO];
 		}
 	}
 }
@@ -239,7 +234,7 @@
 }
 
 - (void)drawPositionIndicator {
-	CGRect indicatorFrame = selectionIndicatorView.frame;
+	CGRect indicatorFrame = _selectionIndicatorView.frame;
 	CGFloat x = self.selectionPoint.x - (indicatorFrame.size.width / 2);
 	CGFloat y;
     
@@ -258,8 +253,8 @@
     
 	// properly place indicator image in view relative to selection point
 	CGRect tmpFrame = CGRectMake(x, y, indicatorFrame.size.width, indicatorFrame.size.height);
-	selectionIndicatorView.frame = tmpFrame;
-	[self addSubview:selectionIndicatorView];
+	_selectionIndicatorView.frame = tmpFrame;
+	[self addSubview:_selectionIndicatorView];
 }
 
 // create a UILabel for this element.
@@ -277,7 +272,7 @@
     
 	// show selected status if this element is the selected one and is currently over selectionPoint
 	int currentIndex = [self nearestMajorElementToCenter];
-	elementLabel.selectedElement = (currentMajorSelectedIndex == index) && (currentIndex == currentMajorSelectedIndex);
+	elementLabel.selectedElement = (_currentMajorSelectedIndex == index) && (currentIndex == _currentMajorSelectedIndex);
     
 	return elementLabel;
 }
@@ -285,8 +280,8 @@
 
 #pragma mark - Scroll To Element Method
 - (void)scrollToMajorElement:(NSInteger)index animated:(BOOL)animate {
-	currentMajorSelectedIndex = index;
-	int x = [self centerOfElementAtIndex:index] - selectionPoint.x;
+	_currentMajorSelectedIndex = index;
+	int x = [self centerOfElementAtIndex:index] - _selectionPoint.x;
 	[_scrollView setContentOffset:CGPointMake(x, 0) animated:animate];
 
 	// notify delegate of the selected index
@@ -301,8 +296,8 @@
 }
 
 - (void)scrollToMinorElement:(NSInteger)index withMajorElement:(NSInteger) majorIndex animated:(BOOL)animate {
-	currentMajorSelectedIndex = index;
-	int x = [self centerOfElementAtIndex:index] - selectionPoint.x;
+	_currentMajorSelectedIndex = index;
+	int x = [self centerOfElementAtIndex:index] - _selectionPoint.x;
 	[_scrollView setContentOffset:CGPointMake(x, 0) animated:animate];
     
 	// notify delegate of the selected index
@@ -324,7 +319,7 @@
 		//		 cases so that the view state is properly preserved.
 
 		// set the current item under the center to "highlighted" or current
-		currentMajorSelectedIndex = [self nearestMajorElementToCenter];
+		_currentMajorSelectedIndex = [self nearestMajorElementToCenter];
 	}
 
 #if (__IPHONE_OS_VERSION_MAX_ALLOWED > __IPHONE_4_3)
@@ -360,7 +355,7 @@
 - (void)setTotalWidthOfScrollContent {
 	NSInteger totalWidth = 0;
 
-	totalWidth = (elementWidth + elementPadding) * numberOfElements;
+	totalWidth = (elementWidth + elementPadding) * _numberOfElements;
     
 	// TODO: is this necessary?
 	totalWidth -= elementPadding; // we add "one too many" in for loop
@@ -375,12 +370,12 @@
 // reset the content inset of the scroll view based on centering first and last elements.
 - (void)updateScrollContentInset {
 	// update content inset if we have element widths
-	if (numberOfElements != 0) {
+	if (_numberOfElements != 0) {
 		CGFloat scrollerWidth = _scrollView.frame.size.width;
 
 		CGFloat halfFirstWidth = 0.0f;
 		CGFloat halfLastWidth  = 0.0f;
-		if ( numberOfElements > 0 ) {
+		if ( _numberOfElements > 0 ) {
 			halfFirstWidth = elementWidth / 2.0; 
 			halfLastWidth  = elementWidth      / 2.0;
 		}
@@ -397,8 +392,8 @@
 		//  +---------|---------------+
 		//  |####| Element |**********| << UIScrollView
 		//  +-------------------------+
-		CGFloat firstInset = selectionPoint.x - halfFirstWidth;
-		CGFloat lastInset  = (scrollerWidth - selectionPoint.x) - halfLastWidth;
+		CGFloat firstInset = _selectionPoint.x - halfFirstWidth;
+		CGFloat lastInset  = (scrollerWidth - _selectionPoint.x) - halfLastWidth;
 
 		_scrollView.contentInset = UIEdgeInsetsMake(0, firstInset, 0, lastInset);
 	}
@@ -407,11 +402,11 @@
 // what is the left-most edge of the element at the given index?
 - (NSInteger)offsetForElementAtIndex:(NSInteger)index {
 	NSInteger offset = 0;
-	if (index >= numberOfElements) {
+	if (index >= _numberOfElements) {
 		return 0;
 	}
 
-	for (int i = 0; i < index && i < numberOfElements; i++) {
+	for (int i = 0; i < index && i < _numberOfElements; i++) {
 		offset += elementWidth;
 		offset += elementPadding;
 	}
@@ -430,7 +425,7 @@
 
 // what is the center of the element at the given index?
 - (NSInteger)centerOfElementAtIndex:(NSInteger)index {
-	if (index >= numberOfElements) {
+	if (index >= _numberOfElements) {
 		return 0;
 	}
 
@@ -442,7 +437,7 @@
 // what is the frame for the element at the given index?
 - (CGRect)frameForElementAtIndex:(NSInteger)index {
 	CGFloat width = 0.0f;
-	if (numberOfElements > index) {
+	if (_numberOfElements > index) {
 		width = elementWidth;
 	}
 	return CGRectMake([self offsetForElementAtIndex:index], 0.0f, width, self.frame.size.height);
@@ -450,7 +445,7 @@
 
 // what is the "center", relative to the content offset and adjusted to selection point?
 - (CGPoint)currentCenter {
-	CGFloat x = _scrollView.contentOffset.x + selectionPoint.x;
+	CGFloat x = _scrollView.contentOffset.x + _selectionPoint.x;
 	return CGPointMake(x, 0.0f);
 }
 
@@ -461,7 +456,7 @@
 
 // what is the element nearest to the given point?
 - (NSInteger)nearestMajorElementToPoint:(CGPoint)point {
-	for (int i = 0; i < numberOfElements; i++) {
+	for (int i = 0; i < _numberOfElements; i++) {
 		CGRect frame = [self frameForElementAtIndex:i];
 		if (CGRectContainsPoint(frame, point)) {
 			return i;
@@ -476,7 +471,7 @@
 			break;
 		} else if (point.x > frame.origin.y) {
 			// if the center is past the last element, scroll to it
-			if (i == numberOfElements - 1) {
+			if (i == _numberOfElements - 1) {
 				return i;
 			}
 		}
@@ -486,7 +481,7 @@
 
 // similar to nearestElementToPoint: however, this method does not look past beginning/end
 - (NSInteger)elementContainingPoint:(CGPoint)point {
-	for (int i = 0; i < numberOfElements; i++) {
+	for (int i = 0; i < _numberOfElements; i++) {
 		CGRect frame = [self frameForElementAtIndex:i];
 		if (CGRectContainsPoint(frame, point)) {
 			return i;
@@ -503,7 +498,7 @@
 
 // what is the element nearest to the given point?
 - (NSInteger)nearestMinorElementToPoint:(CGPoint)point withMajorIndex:(NSInteger)majorIndex  {
-	for (int i = 0; i < numberOfElements; i++) {
+	for (int i = 0; i < _numberOfElements; i++) {
 		CGRect frame = [self frameForElementAtIndex:i];
 		if (CGRectContainsPoint(frame, point)) {
 			return i;
@@ -518,7 +513,7 @@
 			break;
 		} else if (point.x > frame.origin.y) {
 			// if the center is past the last element, scroll to it
-			if (i == numberOfElements - 1) {
+			if (i == _numberOfElements - 1) {
 				return i;
 			}
 		}
@@ -582,30 +577,30 @@
 - (void)getNumberOfElementsFromDataSource {
 	SEL dataSourceCall = @selector(numberOfElementsInHorizontalPickerView:);
 	if (self.dataSource && [self.dataSource respondsToSelector:dataSourceCall]) {
-		numberOfElements = [self.dataSource numberOfElementsInHorizontalPickerView:self];
+		_numberOfElements = [self.dataSource numberOfElementsInHorizontalPickerView:self];
 	} else {
-		numberOfElements = 0;
+		_numberOfElements = 0;
 	}
 }
 
 #pragma mark - Getters and Setters
 - (void)setDelegate:(id)newDelegate {
-	if (delegate != newDelegate) {
-		delegate = newDelegate;
+	if (_delegate != newDelegate) {
+		_delegate = newDelegate;
 		[self collectData];
 	}
 }
 
 - (void)setDataSource:(id)newDataSource {
-	if (dataSource != newDataSource) {
-		dataSource = newDataSource;
+	if (_dataSource != newDataSource) {
+		_dataSource = newDataSource;
 		[self collectData];
 	}
 }
 
 - (void)setSelectionPoint:(CGPoint)point {
-	if (!CGPointEqualToPoint(point, selectionPoint)) {
-		selectionPoint = point;
+	if (!CGPointEqualToPoint(point, _selectionPoint)) {
+		_selectionPoint = point;
 		[self updateScrollContentInset];
 	}
 }
@@ -618,18 +613,18 @@
 }
 
 - (void)setIndicatorPosition:(PickerIndicatorPosition)position {
-	if (indicatorPosition != position) {
-		indicatorPosition = position;
+	if (_indicatorPosition != position) {
+		_indicatorPosition = position;
 		[self drawPositionIndicator];
 	}
 }
 
 - (void)setSelectionIndicatorView:(UIView *)indicatorView {
-	if (selectionIndicatorView != indicatorView) {
-		if (selectionIndicatorView) {
-			[selectionIndicatorView removeFromSuperview];
+	if (_selectionIndicatorView != indicatorView) {
+		if (_selectionIndicatorView) {
+			[_selectionIndicatorView removeFromSuperview];
 		}
-		selectionIndicatorView = indicatorView;
+		_selectionIndicatorView = indicatorView;
         
 		[self drawPositionIndicator];
 	}
@@ -653,24 +648,22 @@
 #pragma mark - Picker Label Implementation
 @implementation PickerLabel : UILabel
 
-@synthesize selectedElement, selectedStateColor, normalStateColor;
-
 - (void)setSelectedElement:(BOOL)selected {
-	if (selectedElement != selected) {
+	if (_selectedElement != selected) {
 		if (selected) {
 			self.textColor = self.selectedStateColor;
 		} else {
 			self.textColor = self.normalStateColor;
 		}
-		selectedElement = selected;
+		_selectedElement = selected;
 		[self setNeedsLayout];
 	}
 }
 
 - (void)setNormalStateColor:(UIColor *)color {
-	if (normalStateColor != color) {
-		normalStateColor = color;
-		self.textColor = normalStateColor;
+	if (_normalStateColor != color) {
+		_normalStateColor = color;
+		self.textColor = _normalStateColor;
 		[self setNeedsLayout];
 	}
 }

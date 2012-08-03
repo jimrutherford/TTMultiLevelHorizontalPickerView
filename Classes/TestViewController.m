@@ -10,10 +10,6 @@
 
 @implementation TestViewController
 
-@synthesize pickerView;
-@synthesize nextButton, reloadButton;
-@synthesize infoLabel;
-
 #pragma mark - iVars
 
 NSMutableArray * dataArray;
@@ -29,11 +25,11 @@ int indexCount;
         
         TTItem * javaItem = [TTItem alloc];
         javaItem.itemName = @"Java";
-        javaItem.items = [NSArray arrayWithObjects:@"JavaOne", @"JavaTwo", @"JavaThree", nil];
+        javaItem.items = @[@"JavaOne", @"JavaTwo", @"JavaThree"];
         
         TTItem * htmlItem = [TTItem alloc];
         htmlItem.itemName = @"HTML";
-        htmlItem.items = [NSArray arrayWithObjects:@"HTMLOne", @"HTMLTwo", nil];
+        htmlItem.items = @[@"HTMLOne", @"HTMLTwo"];
         
         TTItem * objcItem = [TTItem alloc];
         objcItem.itemName = @"Objective-C";
@@ -43,7 +39,7 @@ int indexCount;
         
         TTItem * rubyItem = [TTItem alloc];
         rubyItem.itemName = @"Ruby";
-        rubyItem.items = [NSArray arrayWithObjects:@"RubyOne", @"RubyTwo", @"RubyThree", @"RubyFour", @"RubyFive", nil];
+        rubyItem.items = @[@"RubyOne", @"RubyTwo", @"RubyThree", @"RubyFour", @"RubyFive"];
 
         TTItem * pythonItem = [TTItem alloc];
         pythonItem.itemName = @"Python";
@@ -87,46 +83,46 @@ int indexCount;
 //	CGFloat x = (self.view.frame.size.width - width) / 2.0f;
 //	CGRect tmpFrame = CGRectMake(x, 150.0f, width, 40.0f);
 
-	pickerView = [[TTMultiLevelHorizontalPickerView alloc] initWithFrame:tmpFrame];
-	pickerView.backgroundColor   = [UIColor darkGrayColor];
-	pickerView.selectedTextColor = [UIColor whiteColor];
-	pickerView.textColor   = [UIColor grayColor];
-	pickerView.delegate    = self;
-	pickerView.dataSource  = self;
-	pickerView.elementFont = [UIFont boldSystemFontOfSize:14.0f];
-	pickerView.selectionPoint = CGPointMake(width/2, 0);
+	_pickerView = [[TTMultiLevelHorizontalPickerView alloc] initWithFrame:tmpFrame];
+	_pickerView.backgroundColor   = [UIColor darkGrayColor];
+	_pickerView.selectedTextColor = [UIColor whiteColor];
+	_pickerView.textColor   = [UIColor grayColor];
+	_pickerView.delegate    = self;
+	_pickerView.dataSource  = self;
+	_pickerView.elementFont = [UIFont boldSystemFontOfSize:14.0f];
+	_pickerView.selectionPoint = CGPointMake(width/2, 0);
 
 	// add carat or other view to indicate selected element
 	UIImageView *indicator = [[UIImageView alloc] initWithImage:[UIImage imageNamed:@"indicator"]];
-	pickerView.selectionIndicatorView = indicator;
+	_pickerView.selectionIndicatorView = indicator;
 //	pickerView.indicatorPosition = PickerIndicatorTop; // specify indicator's location
 
-	[self.view addSubview:pickerView];
+	[self.view addSubview:_pickerView];
 
 	self.nextButton = [UIButton buttonWithType:UIButtonTypeRoundedRect];
 	y = y + tmpFrame.size.height + spacing;
 	tmpFrame = CGRectMake(x, y, width, 50.0f);
-	nextButton.frame = tmpFrame;
-	[nextButton addTarget:self action:@selector(nextButtonTapped:) forControlEvents:UIControlEventTouchUpInside];
-	[nextButton	setTitle:@"Center Element 0" forState:UIControlStateNormal];
-	nextButton.titleLabel.textColor = [UIColor blackColor];
-	[self.view addSubview:nextButton];
+	_nextButton.frame = tmpFrame;
+	[_nextButton addTarget:self action:@selector(nextButtonTapped:) forControlEvents:UIControlEventTouchUpInside];
+	[_nextButton	setTitle:@"Center Element 0" forState:UIControlStateNormal];
+	_nextButton.titleLabel.textColor = [UIColor blackColor];
+	[self.view addSubview:_nextButton];
 
 	self.reloadButton = [UIButton buttonWithType:UIButtonTypeRoundedRect];
 	y = y + tmpFrame.size.height + spacing;
 	tmpFrame = CGRectMake(x, y, width, 50.0f);
-	reloadButton.frame = tmpFrame;
-	[reloadButton addTarget:self action:@selector(reloadButtonTapped:) forControlEvents:UIControlEventTouchUpInside];
-	[reloadButton setTitle:@"Reload Data" forState:UIControlStateNormal];
-	[self.view addSubview:reloadButton];
+	_reloadButton.frame = tmpFrame;
+	[_reloadButton addTarget:self action:@selector(reloadButtonTapped:) forControlEvents:UIControlEventTouchUpInside];
+	[_reloadButton setTitle:@"Reload Data" forState:UIControlStateNormal];
+	[self.view addSubview:_reloadButton];
 
 	y = y + tmpFrame.size.height + spacing;
 	tmpFrame = CGRectMake(x, y, width, 50.0f);
-	infoLabel = [[UILabel alloc] initWithFrame:tmpFrame];
-	infoLabel.backgroundColor = [UIColor blackColor];
-	infoLabel.textColor = [UIColor whiteColor];
-	infoLabel.textAlignment = UITextAlignmentCenter;
-	[self.view addSubview:infoLabel];
+	_infoLabel = [[UILabel alloc] initWithFrame:tmpFrame];
+	_infoLabel.backgroundColor = [UIColor blackColor];
+	_infoLabel.textColor = [UIColor whiteColor];
+	_infoLabel.textAlignment = UITextAlignmentCenter;
+	[self.view addSubview:_infoLabel];
 }
 
 - (void)viewDidUnload {
@@ -139,7 +135,7 @@ int indexCount;
 
 - (void)viewWillAppear:(BOOL)animated {
 	[super viewWillAppear:animated];
-	[pickerView scrollToMajorElement:0 animated:NO];
+	[_pickerView scrollToMajorElement:0 animated:NO];
 }
 
 - (BOOL)shouldAutorotateToInterfaceOrientation:(UIInterfaceOrientation)interfaceOrientation {
@@ -181,33 +177,33 @@ int indexCount;
 		spacing = 10.0f;
 		tmpFrame = CGRectMake(x, y, width, height);
 	}
-	pickerView.frame = tmpFrame;
+	_pickerView.frame = tmpFrame;
 	
 	y = y + tmpFrame.size.height + spacing;
-	tmpFrame = nextButton.frame;
+	tmpFrame = _nextButton.frame;
 	tmpFrame.origin.y = y;
-	nextButton.frame = tmpFrame;
+	_nextButton.frame = tmpFrame;
 	
 	y = y + tmpFrame.size.height + spacing;
-	tmpFrame = reloadButton.frame;
+	tmpFrame = _reloadButton.frame;
 	tmpFrame.origin.y = y;
-	reloadButton.frame = tmpFrame;
+	_reloadButton.frame = tmpFrame;
 	
 	y = y + tmpFrame.size.height + spacing;
-	tmpFrame = infoLabel.frame;
+	tmpFrame = _infoLabel.frame;
 	tmpFrame.origin.y = y;
-	infoLabel.frame = tmpFrame;
+	_infoLabel.frame = tmpFrame;
 
 }
 
 #pragma mark - Button Tap Handlers
 - (void)nextButtonTapped:(id)sender {
-	[pickerView scrollToMajorElement:indexCount animated:NO];
+	[_pickerView scrollToMajorElement:indexCount animated:NO];
 	indexCount += 1;
 	if ([dataArray count] <= indexCount) {
 		indexCount = 0;
 	}
-	[nextButton	setTitle:[NSString stringWithFormat:@"Center Element %d", indexCount]
+	[_nextButton	setTitle:[NSString stringWithFormat:@"Center Element %d", indexCount]
 				forState:UIControlStateNormal];
 }
 
@@ -217,7 +213,7 @@ int indexCount;
 		[dataArray removeLastObject];
 	}
 
-	[pickerView reloadData];
+	[_pickerView reloadData];
 }
 
 #pragma mark - HorizontalPickerView DataSource Methods
@@ -227,12 +223,12 @@ int indexCount;
 
 #pragma mark - MultiLevelHorizontalPickerView Delegate Methods
 - (NSString *)multiLevelHorizontalPickerView:(TTMultiLevelHorizontalPickerView *)picker titleForElementAtIndex:(NSInteger)index {
-	TTItem * item = [dataArray objectAtIndex:index];
+	TTItem * item = dataArray[index];
     return item.itemName;
 }
 
 - (NSArray *)multiLevelHorizontalPickerView:(TTMultiLevelHorizontalPickerView *)picker childrenForElementAtIndex:(NSInteger)index {
-	TTItem * item = [dataArray objectAtIndex:index];
+	TTItem * item = dataArray[index];
     return item.items;
 }
 
