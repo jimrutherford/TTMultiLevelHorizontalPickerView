@@ -135,7 +135,7 @@
 		}
 	}
 
-    NSLog(@"Laying out subviews");
+    //NSLog(@"Laying out subviews");
     
 	// find needed elements by looking at left and right edges of frame
 	CGPoint offset = _scrollView.contentOffset;
@@ -163,7 +163,6 @@
         // draw sub elements
         NSArray * subElements = [self.delegate multiLevelHorizontalPickerView:self childrenForElementAtIndex:i];   
         NSInteger numberOfSubElements = [subElements count];
-        NSLog(@"number of sub elements ==> %d", numberOfSubElements);
     
         int interval; 
         if (numberOfSubElements < 2) {
@@ -198,11 +197,11 @@
 	// determine if scroll view needs to shift in response to resizing?
 	if (_currentMajorSelectedIndex > -1 && [self centerOfElementAtIndex:_currentMajorSelectedIndex] != [self currentCenter].x) {
 		if (adjustWhenFinished) {
-			[self scrollToMajorElement:_currentMajorSelectedIndex animated:NO];
+			[self scrollToMinorElement:0 withMajorElement:_currentMajorSelectedIndex animated:NO];
 		} else if (_numberOfElements <= _currentMajorSelectedIndex) {
 			// if currentSelectedIndex no longer exists, select what is currently centered
 			_currentMajorSelectedIndex = [self nearestMajorElementToCenter];
-			[self scrollToMajorElement:_currentMajorSelectedIndex animated:NO];
+			[self scrollToMinorElement:0 withMajorElement:_currentMajorSelectedIndex animated:NO];
 		}
 	}
 }
@@ -277,33 +276,15 @@
 	return elementLabel;
 }
 
-
-#pragma mark - Scroll To Element Method
-- (void)scrollToMajorElement:(NSInteger)index animated:(BOOL)animate {
-	_currentMajorSelectedIndex = index;
-	int x = [self centerOfElementAtIndex:index] - _selectionPoint.x;
-	[_scrollView setContentOffset:CGPointMake(x, 0) animated:animate];
-
-	// notify delegate of the selected index
-	SEL delegateCall = @selector(multiLevelHorizontalPickerView:didSelectElementAtIndex:);
-	if (self.delegate && [self.delegate respondsToSelector:delegateCall]) {
-		[self.delegate multiLevelHorizontalPickerView:self didSelectElementAtIndex:index];
-	}
-
-#if (__IPHONE_OS_VERSION_MAX_ALLOWED > __IPHONE_4_3)
-	[self setNeedsLayout];
-#endif
-}
-
 - (void)scrollToMinorElement:(NSInteger)index withMajorElement:(NSInteger) majorIndex animated:(BOOL)animate {
-	_currentMajorSelectedIndex = index;
-	int x = [self centerOfElementAtIndex:index] - _selectionPoint.x;
+	_currentMajorSelectedIndex = majorIndex;
+	int x = [self centerOfElementAtIndex:majorIndex] - _selectionPoint.x;
 	[_scrollView setContentOffset:CGPointMake(x, 0) animated:animate];
     
 	// notify delegate of the selected index
 	SEL delegateCall = @selector(multiLevelHorizontalPickerView:didSelectElementAtIndex:);
 	if (self.delegate && [self.delegate respondsToSelector:delegateCall]) {
-		[self.delegate multiLevelHorizontalPickerView:self didSelectElementAtIndex:index];
+		[self.delegate multiLevelHorizontalPickerView:self didSelectElementAtIndex:majorIndex];
 	}
     
 #if (__IPHONE_OS_VERSION_MAX_ALLOWED > __IPHONE_4_3)
@@ -498,26 +479,33 @@
 
 // what is the element nearest to the given point?
 - (NSInteger)nearestMinorElementToPoint:(CGPoint)point withMajorIndex:(NSInteger)majorIndex  {
-	for (int i = 0; i < _numberOfElements; i++) {
-		CGRect frame = [self frameForElementAtIndex:i];
-		if (CGRectContainsPoint(frame, point)) {
-			return i;
-		} else if (point.x < frame.origin.x) {
-			// if the center is before this element, go back to last one,
-			//     unless we're at the beginning
-			if (i > 0) {
-				return i - 1;
-			} else {
-				return 0;
-			}
-			break;
-		} else if (point.x > frame.origin.y) {
-			// if the center is past the last element, scroll to it
-			if (i == _numberOfElements - 1) {
-				return i;
-			}
-		}
-	}
+	
+    
+    NSArray * subElements = [self.delegate multiLevelHorizontalPickerView:self childrenForElementAtIndex:majorIndex];
+    NSInteger numberOfSubElements = [subElements count];
+    NSLog(@"number of sub elements ==> %d", numberOfSubElements);
+    
+    
+//    for (int i = 0; i < _numberOfElements; i++) {
+//		CGRect frame = [self frameForElementAtIndex:i];
+//		if (CGRectContainsPoint(frame, point)) {
+//			return i;
+//		} else if (point.x < frame.origin.x) {
+//			// if the center is before this element, go back to last one,
+//			//     unless we're at the beginning
+//			if (i > 0) {
+//				return i - 1;
+//			} else {
+//				return 0;
+//			}
+//			break;
+//		} else if (point.x > frame.origin.y) {
+//			// if the center is past the last element, scroll to it
+//			if (i == _numberOfElements - 1) {
+//				return i;
+//			}
+//		}
+//	}
 	return 0;
 }
 
@@ -525,14 +513,14 @@
 
 // move scroll view to position nearest element under the center
 - (void)scrollToElementNearestToCenter {
-	
-    
     int majorIndex = [self nearestMajorElementToCenter];
     int minorIndex = [self nearestMinorElementToCenterWithMajorIndex:majorIndex];
     
+    NSLog(@"Major Index ==> %d", majorIndex);
+    NSLog(@"Minor Index ==> %d", minorIndex);
     
     //[self scrollToMajorElement:majorIndex animated:YES];
-    [self scrollToMinorElement:minorIndex withMajorElement:minorIndex  animated:YES];
+    [self scrollToMinorElement:minorIndex withMajorElement:majorIndex  animated:YES];
 }
 
 
@@ -543,7 +531,7 @@
 		CGPoint tapLocation    = [recognizer locationInView:_scrollView];
 		NSInteger elementIndex = [self elementContainingPoint:tapLocation];
 		if (elementIndex != -1) { // point not in element
-			[self scrollToMajorElement:elementIndex animated:YES];
+			[self scrollToMinorElement:0 withMajorElement:elementIndex animated:YES];
 		}
 	}
 }
