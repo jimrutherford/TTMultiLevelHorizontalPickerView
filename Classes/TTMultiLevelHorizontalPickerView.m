@@ -134,8 +134,6 @@
 			}
 		}
 	}
-
-    //NSLog(@"Laying out subviews");
     
 	// find needed elements by looking at left and right edges of frame
 	CGPoint offset = _scrollView.contentOffset;
@@ -485,27 +483,27 @@
     NSInteger numberOfSubElements = [subElements count];
     NSLog(@"number of sub elements ==> %d", numberOfSubElements);
     
+    if (numberOfSubElements < 2) return numberOfSubElements;
     
-//    for (int i = 0; i < _numberOfElements; i++) {
-//		CGRect frame = [self frameForElementAtIndex:i];
-//		if (CGRectContainsPoint(frame, point)) {
-//			return i;
-//		} else if (point.x < frame.origin.x) {
-//			// if the center is before this element, go back to last one,
-//			//     unless we're at the beginning
-//			if (i > 0) {
-//				return i - 1;
-//			} else {
-//				return 0;
-//			}
-//			break;
-//		} else if (point.x > frame.origin.y) {
-//			// if the center is past the last element, scroll to it
-//			if (i == _numberOfElements - 1) {
-//				return i;
-//			}
-//		}
-//	}
+    CGRect frame = [self frameForElementAtIndex:majorIndex];
+    NSLog(@"Frame X Origin - %f", frame.origin.x);
+    NSLog(@"Point X - %f", point.x);
+    
+    double pointOffset = point.x - frame.origin.x;
+    
+    NSLog(@"Point Offset - %f", pointOffset);
+    
+    double interval = elementWidth / (numberOfSubElements + 1);
+    
+    for (int i = 0; i < numberOfSubElements; i++) {
+        
+        double pointForSubElement = (i+1)*interval;
+        
+        double distance = pointOffset = pointForSubElement;
+        
+        NSLog(@"========== SubPoint for element %i - %f with distance of %f", i, pointForSubElement, distance);
+        
+	}
 	return 0;
 }
 
