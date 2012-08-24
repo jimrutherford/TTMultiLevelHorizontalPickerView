@@ -70,23 +70,21 @@ int indexCount;
 - (void)viewDidLoad {
 	[super viewDidLoad];
 
-	self.view.backgroundColor = [UIColor blackColor];
 	CGFloat margin = 40.0f;
 	CGFloat width = (self.view.bounds.size.width - (margin * 2.0f));
 	CGFloat pickerHeight = 100.0f;
 	CGFloat x = margin;
-	CGFloat y = 150.0f;
+	CGFloat y = 50.0f;
 	CGFloat spacing = 25.0f;
 	CGRect tmpFrame = CGRectMake(x, y, width, pickerHeight);
 
-//	CGFloat width = 200.0f;
-//	CGFloat x = (self.view.frame.size.width - width) / 2.0f;
-//	CGRect tmpFrame = CGRectMake(x, 150.0f, width, 40.0f);
-
+    UIImageView *background = [[UIImageView alloc] initWithImage:[UIImage imageNamed:@"background"]];
+    [self.view addSubview:background];
+   
 	_pickerView = [[TTMultiLevelHorizontalPickerView alloc] initWithFrame:tmpFrame];
-	_pickerView.backgroundColor   = [UIColor darkGrayColor];
+	_pickerView.backgroundColor   = [UIColor clearColor];
 	_pickerView.selectedTextColor = [UIColor whiteColor];
-	_pickerView.textColor   = [UIColor grayColor];
+	_pickerView.textColor   = [UIColor blackColor];
 	_pickerView.delegate    = self;
 	_pickerView.dataSource  = self;
 	_pickerView.elementFont = [UIFont boldSystemFontOfSize:14.0f];
@@ -123,6 +121,13 @@ int indexCount;
 	_infoLabel.textColor = [UIColor whiteColor];
 	_infoLabel.textAlignment = UITextAlignmentCenter;
 	[self.view addSubview:_infoLabel];
+    
+    
+    UIImageView *mask = [[UIImageView alloc] initWithImage:[UIImage imageNamed:@"mask"]];
+    CGRect maskFrame = CGRectMake(0,45,320,110);
+    mask.frame = maskFrame;
+    [self.view addSubview:mask];
+    
 }
 
 - (void)viewDidUnload {
@@ -139,25 +144,8 @@ int indexCount;
 }
 
 - (BOOL)shouldAutorotateToInterfaceOrientation:(UIInterfaceOrientation)interfaceOrientation {
-	return YES;
-//	(interfaceOrientation == UIInterfaceOrientationPortrait ||
-//	 interfaceOrientation == UIInterfaceOrientationLandscapeLeft ||
-//	 interfaceOrientation == UIInterfaceOrientationLandscapeRight);
+	return NO;
 }
-
-//- (void)willAnimateRotationToInterfaceOrientation:(UIInterfaceOrientation)toInterfaceOrientation duration:(NSTimeInterval)duration {
-//	CGFloat margin = 40.0f;
-//	CGFloat width = (self.view.frame.size.width - (margin * 2.0f));
-//	CGFloat height = 40.0f;
-//	CGRect tmpFrame;
-//	if (toInterfaceOrientation == UIInterfaceOrientationLandscapeLeft ||
-//		toInterfaceOrientation == UIInterfaceOrientationLandscapeRight) {
-//		tmpFrame = CGRectMake(margin, 50.0f, width + 100.0f, height);
-//	} else {
-//		tmpFrame = CGRectMake(margin, 150.0f, width, height);
-//	}
-//	pickerView.frame = tmpFrame;
-//}
 
 - (void)didRotateFromInterfaceOrientation:(UIInterfaceOrientation)fromInterfaceOrientation {
 	CGFloat margin = 40.0f;
