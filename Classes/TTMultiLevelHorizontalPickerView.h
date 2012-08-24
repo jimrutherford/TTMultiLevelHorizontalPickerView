@@ -44,11 +44,3 @@ typedef enum {
 @end
 
 
-// sub-class of UILabel that knows how to change it's state
-@interface PickerLabel : UILabel <TTMultiLevelHorizontalPickerElementState> { }
-
-@property (nonatomic, assign) BOOL selectedElement;
-@property (nonatomic, retain) UIColor *selectedStateColor;
-@property (nonatomic, retain) UIColor *normalStateColor;
-
-@end

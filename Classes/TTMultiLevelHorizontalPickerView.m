@@ -6,7 +6,7 @@
 //
 
 #import "TTMultiLevelHorizontalPickerView.h"
-
+#import "TTPickerLabel.h"
 
 #pragma mark - Internal Method Interface
 @interface TTMultiLevelHorizontalPickerView () {
@@ -26,35 +26,6 @@
 	int lastVisibleElement;
 }
 
-- (void)collectData;
-
-- (void)getNumberOfElementsFromDataSource;
-- (void)setTotalWidthOfScrollContent;
-- (void)updateScrollContentInset;
-
-- (void)addScrollView;
-- (void)drawPositionIndicator;
-- (PickerLabel *)labelForForElementAtIndex:(NSInteger)index withTitle:(NSString *)title;
-- (CGRect)frameForElementAtIndex:(NSInteger)index;
-
-- (CGPoint)currentCenter;
-- (void)scrollToElementNearestToCenter;
-
-- (NSInteger)nearestMajorElementToCenter;
-- (NSInteger)nearestMajorElementToPoint:(CGPoint)point;
-
-- (NSInteger)nearestMinorElementToCenterWithMajorIndex:(NSInteger)majorIndex;
-- (NSInteger)nearestMinorElementToPoint:(CGPoint)point withMajorIndex:(NSInteger)majorIndex;
-
-- (NSInteger)elementContainingPoint:(CGPoint)point;
-
-- (NSInteger)offsetForElementAtIndex:(NSInteger)index;
-- (NSInteger)centerOfElementAtIndex:(NSInteger)index;
-
-- (void)scrollViewTapped:(UITapGestureRecognizer *)recognizer;
-
-- (NSInteger)tagForElementAtIndex:(NSInteger)index;
-- (NSInteger)indexForElement:(UIView *)element;
 @end
 
 
@@ -193,7 +164,7 @@
 	lastVisibleElement  = lastNeededElement;
 
 	// determine if scroll view needs to shift in response to resizing?
-	if (_currentMajorSelectedIndex > -1 && [self centerOfElementAtIndex:_currentMajorSelectedIndex] != [self currentCenter].x) {
+	if (_currentMajorSelectedIndex > -1 && [self centerOfMinorElementAtIndex:0 withMajorIndex:_currentMajorSelectedIndex] != [self currentCenter].x) {
 		if (adjustWhenFinished) {
 			[self scrollToMinorElement:0 withMajorElement:_currentMajorSelectedIndex animated:NO];
 		} else if (_numberOfElements <= _currentMajorSelectedIndex) {
@@ -274,9 +245,9 @@
 	return elementLabel;
 }
 
-- (void)scrollToMinorElement:(NSInteger)index withMajorElement:(NSInteger) majorIndex animated:(BOOL)animate {
+- (void)scrollToMinorElement:(NSInteger)minorIndex withMajorElement:(NSInteger) majorIndex animated:(BOOL)animate {
 	_currentMajorSelectedIndex = majorIndex;
-	int x = [self centerOfElementAtIndex:majorIndex] - _selectionPoint.x;
+	int x = [self centerOfMinorElementAtIndex:minorIndex withMajorIndex:majorIndex] - _selectionPoint.x;
 	[_scrollView setContentOffset:CGPointMake(x, 0) animated:animate];
     
 	// notify delegate of the selected index
@@ -403,14 +374,28 @@
 }
 
 // what is the center of the element at the given index?
-- (NSInteger)centerOfElementAtIndex:(NSInteger)index {
-	if (index >= _numberOfElements) {
+- (NSInteger)centerOfMinorElementAtIndex:(NSInteger)minorIndex withMajorIndex:(NSInteger)majorIndex {
+	if (majorIndex >= _numberOfElements) {
 		return 0;
 	}
 
-	NSInteger elementOffset = [self offsetForElementAtIndex:index];
+	NSInteger elementOffset = [self offsetForElementAtIndex:majorIndex];
 
-	return elementOffset + elementWidth / 2;
+    
+    NSArray * subElements = [self.delegate multiLevelHorizontalPickerView:self childrenForElementAtIndex:majorIndex];
+    NSInteger numberOfSubElements = [subElements count];
+    
+    NSInteger subElementOffset = 0;
+    
+    if (numberOfSubElements < 2) {
+        subElementOffset = elementWidth / 2;
+    } else {
+        double interval = elementWidth / (numberOfSubElements + 1);
+        subElementOffset = (minorIndex+1)*interval;
+    }
+    
+    
+	return elementOffset + subElementOffset;
 }
 
 // what is the frame for the element at the given index?
@@ -477,34 +462,36 @@
 
 // what is the element nearest to the given point?
 - (NSInteger)nearestMinorElementToPoint:(CGPoint)point withMajorIndex:(NSInteger)majorIndex  {
-	
-    
     NSArray * subElements = [self.delegate multiLevelHorizontalPickerView:self childrenForElementAtIndex:majorIndex];
     NSInteger numberOfSubElements = [subElements count];
-    NSLog(@"number of sub elements ==> %d", numberOfSubElements);
     
     if (numberOfSubElements < 2) return numberOfSubElements;
     
     CGRect frame = [self frameForElementAtIndex:majorIndex];
-    NSLog(@"Frame X Origin - %f", frame.origin.x);
-    NSLog(@"Point X - %f", point.x);
     
     double pointOffset = point.x - frame.origin.x;
     
-    NSLog(@"Point Offset - %f", pointOffset);
-    
     double interval = elementWidth / (numberOfSubElements + 1);
+    
+    // seed this with a value obviously larger than what we're looking for
+    double tempPoint = elementWidth + 9999;
+    
+    int closestSubElement = 0;
     
     for (int i = 0; i < numberOfSubElements; i++) {
         
         double pointForSubElement = (i+1)*interval;
         
-        double distance = pointOffset = pointForSubElement;
+        double distance = fabs(pointOffset - pointForSubElement);
         
-        NSLog(@"========== SubPoint for element %i - %f with distance of %f", i, pointForSubElement, distance);
-        
+        if (distance < tempPoint) {
+            tempPoint = distance;
+            closestSubElement = i;
+        }
 	}
-	return 0;
+    NSLog(@"Nearest sub element - %i", closestSubElement);
+    
+	return closestSubElement;
 }
 
 
@@ -625,33 +612,5 @@
 	[super setFrame:newFrame];
 }
 
-
-@end
-
-
-
-// ------------------------------------------------------------------------
-#pragma mark - Picker Label Implementation
-@implementation PickerLabel : UILabel
-
-- (void)setSelectedElement:(BOOL)selected {
-	if (_selectedElement != selected) {
-		if (selected) {
-			self.textColor = self.selectedStateColor;
-		} else {
-			self.textColor = self.normalStateColor;
-		}
-		_selectedElement = selected;
-		[self setNeedsLayout];
-	}
-}
-
-- (void)setNormalStateColor:(UIColor *)color {
-	if (_normalStateColor != color) {
-		_normalStateColor = color;
-		self.textColor = _normalStateColor;
-		[self setNeedsLayout];
-	}
-}
 
 @end
