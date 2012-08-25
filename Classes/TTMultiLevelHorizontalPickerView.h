@@ -36,6 +36,8 @@ typedef enum {
 // the point, defaults to center of view, where the selected element sits
 @property (nonatomic, assign) CGPoint selectionPoint;
 @property (nonatomic, retain) UIView *selectionIndicatorView;
+@property (nonatomic, retain) UIView *minorTickView;
+@property (nonatomic, retain) UIView *majorDividerView;
 
 @property (nonatomic, assign) PickerIndicatorPosition indicatorPosition;
 

@@ -215,6 +215,13 @@ int indexCount;
     return item.itemName;
 }
 
+#pragma mark - MultiLevelHorizontalPickerView Delegate Methods
+- (NSString *)multiLevelHorizontalPickerView:(TTMultiLevelHorizontalPickerView *)picker titleForMinorElementAtIndex:(NSInteger)minorIndex withMajorIndex:(NSInteger)majorIndex {
+	TTItem * item = [dataArray objectAtIndex:majorIndex];
+    return [item.items objectAtIndex:minorIndex];
+}
+
+
 - (NSArray *)multiLevelHorizontalPickerView:(TTMultiLevelHorizontalPickerView *)picker childrenForElementAtIndex:(NSInteger)index {
 	TTItem * item = [dataArray objectAtIndex:index];
     return item.items;

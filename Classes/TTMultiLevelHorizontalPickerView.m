@@ -7,10 +7,12 @@
 
 #import "TTMultiLevelHorizontalPickerView.h"
 #import "TTPickerLabel.h"
+#import "TTItem.h"
 
 #pragma mark - Internal Method Interface
 @interface TTMultiLevelHorizontalPickerView () {
 	UIScrollView *_scrollView;
+    UILabel *_minorElementTitleLabel;
 
 	NSInteger elementPadding;
     
@@ -37,6 +39,7 @@
 	if ((self = [super initWithFrame:frame])) {
 
 		[self addScrollView];
+        [self addMinorItemTitleLabel];
 
 		self.textColor   = [UIColor blackColor];
 		self.elementFont = [UIFont systemFontOfSize:12.0f];
@@ -78,7 +81,6 @@
 	}
 
 	SEL titleForElementSelector = @selector(multiLevelHorizontalPickerView:titleForElementAtIndex:);
-    //SEL childrenForElementSelector = @selector(multiLevelHorizontalPickerView:childrenForElementAtIndex:);
 	SEL setSelectedSelector     = @selector(setSelectedElement:);
 
 	CGRect visibleBounds   = [self bounds];
@@ -128,7 +130,6 @@
 			}
 		}
     
-    
         // draw sub elements
         NSArray * subElements = [self.delegate multiLevelHorizontalPickerView:self childrenForElementAtIndex:i];   
         NSInteger numberOfSubElements = [subElements count];
@@ -144,13 +145,14 @@
         }
     
         int location = interval;
-    for (int j = 0; j < numberOfSubElements; j++)
-    {
-        UIView *subLineView = [[UIView alloc] initWithFrame:CGRectMake(i * elementWidth + location, 0, 1, 30)];
-        subLineView.backgroundColor = [UIColor greenColor];
-        [_scrollView addSubview:subLineView];
-        location += interval;
-    }
+        
+        for (int j = 0; j < numberOfSubElements; j++)
+        {
+            UIView *subLineView = [[UIView alloc] initWithFrame:CGRectMake(i * elementWidth + location, 0, 1, 30)];
+            subLineView.backgroundColor = [UIColor greenColor];
+            [_scrollView addSubview:subLineView];
+            location += interval;
+        }
     
     
         // draw element divider lines
@@ -158,6 +160,17 @@
         lineView.backgroundColor = [UIColor redColor];
         [_scrollView addSubview:lineView];
 	} 
+    
+    int majorElement = [self nearestMajorElementToCenter];
+    int minorElement = [self nearestMinorElementToPoint:[self currentCenter] withMajorIndex:_currentMajorSelectedIndex];
+    
+    SEL titleForMinorElementSelector = @selector(multiLevelHorizontalPickerView:titleForMinorElementAtIndex:withMajorIndex:);
+    
+    if (self.delegate && [self.delegate respondsToSelector:titleForMinorElementSelector]) {
+        NSString *title = [self.delegate multiLevelHorizontalPickerView:self titleForMinorElementAtIndex:minorElement withMajorIndex:majorElement];
+        
+        _minorElementTitleLabel.text = title;
+    }
     
 	// save off what's visible now
 	firstVisibleElement = firstNeededElement;
@@ -174,6 +187,8 @@
 		}
 	}
 }
+
+
 
 #pragma mark - View Creation Methods (Internal Methods)
 - (void)addScrollView {
@@ -201,6 +216,19 @@
 	}
 }
 
+- (void) addMinorItemTitleLabel {
+    if (_minorElementTitleLabel == nil) {
+        _minorElementTitleLabel = [[UILabel alloc] initWithFrame:self.bounds];
+        _minorElementTitleLabel.text = @"subelement";
+        _minorElementTitleLabel.backgroundColor = [UIColor clearColor];
+        _minorElementTitleLabel.textAlignment = UITextAlignmentCenter;
+        _minorElementTitleLabel.font = [UIFont boldSystemFontOfSize:14.0f];;
+        _minorElementTitleLabel.textColor = [UIColor whiteColor];
+
+        [self addSubview:_minorElementTitleLabel];
+    }
+}
+
 - (void)drawPositionIndicator {
 	CGRect indicatorFrame = _selectionIndicatorView.frame;
 	CGFloat x = self.selectionPoint.x - (indicatorFrame.size.width / 2);
@@ -224,6 +252,7 @@
 	_selectionIndicatorView.frame = tmpFrame;
 	[self addSubview:_selectionIndicatorView];
 }
+
 
 // create a UILabel for this element.
 - (PickerLabel *)labelForForElementAtIndex:(NSInteger)index withTitle:(NSString *)title {
@@ -404,7 +433,7 @@
 	if (_numberOfElements > index) {
 		width = elementWidth;
 	}
-	return CGRectMake([self offsetForElementAtIndex:index], 0.0f, width, self.frame.size.height);
+	return CGRectMake([self offsetForElementAtIndex:index], 0.0f, width, 40);
 }
 
 // what is the "center", relative to the content offset and adjusted to selection point?
@@ -488,9 +517,7 @@
             tempPoint = distance;
             closestSubElement = i;
         }
-	}
-    NSLog(@"Nearest sub element - %i", closestSubElement);
-    
+	}    
 	return closestSubElement;
 }
 
@@ -500,9 +527,6 @@
 - (void)scrollToElementNearestToCenter {
     int majorIndex = [self nearestMajorElementToCenter];
     int minorIndex = [self nearestMinorElementToCenterWithMajorIndex:majorIndex];
-    
-    NSLog(@"Major Index ==> %d", majorIndex);
-    NSLog(@"Minor Index ==> %d", minorIndex);
     
     //[self scrollToMajorElement:majorIndex animated:YES];
     [self scrollToMinorElement:minorIndex withMajorElement:majorIndex  animated:YES];
@@ -556,6 +580,7 @@
 	}
 }
 
+
 #pragma mark - Getters and Setters
 - (void)setDelegate:(id)newDelegate {
 	if (_delegate != newDelegate) {
@@ -600,6 +625,24 @@
 		_selectionIndicatorView = indicatorView;
         
 		[self drawPositionIndicator];
+	}
+}
+
+- (void)setMinorTickView:(UIView *)minorTickView {
+	if (_minorTickView != minorTickView) {
+		if (_minorTickView) {
+			// code to relayout control with new tick
+		}
+		_minorTickView = minorTickView;
+	}
+}
+
+- (void)setMajorDividerView:(UIView *)majorDividerView {
+	if (_majorDividerView != majorDividerView) {
+		if (_majorDividerView) {
+			// code to relayout control with new divider
+		}
+		_majorDividerView = majorDividerView;
 	}
 }
 

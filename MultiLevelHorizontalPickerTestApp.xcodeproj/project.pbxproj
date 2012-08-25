@@ -18,6 +18,8 @@
 		37733247159BD1B300171BBA /* TTItem.m in Sources */ = {isa = PBXBuildFile; fileRef = 37733246159BD1B300171BBA /* TTItem.m */; };
 		37CBBCC715E814170086D8A5 /* background.png in Resources */ = {isa = PBXBuildFile; fileRef = 37CBBCC615E814170086D8A5 /* background.png */; };
 		37CBBCCA15E820590086D8A5 /* mask.png in Resources */ = {isa = PBXBuildFile; fileRef = 37CBBCC915E820590086D8A5 /* mask.png */; };
+		37DF63D015E92CE40097DADF /* divider.png in Resources */ = {isa = PBXBuildFile; fileRef = 37DF63CE15E92CE40097DADF /* divider.png */; };
+		37DF63D115E92CE40097DADF /* tick.png in Resources */ = {isa = PBXBuildFile; fileRef = 37DF63CF15E92CE40097DADF /* tick.png */; };
 		76C2023A124A529A000F0F70 /* indicator.png in Resources */ = {isa = PBXBuildFile; fileRef = 76C20238124A529A000F0F70 /* indicator.png */; };
 		76C2023B124A529A000F0F70 /* indicator@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = 76C20239124A529A000F0F70 /* indicator@2x.png */; };
 		76EFB41D124789F5003020A7 /* TestViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 76EFB41B124789F5003020A7 /* TestViewController.m */; };
@@ -42,6 +44,8 @@
 		37733246159BD1B300171BBA /* TTItem.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = TTItem.m; path = Classes/TTItem.m; sourceTree = "<group>"; };
 		37CBBCC615E814170086D8A5 /* background.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = background.png; sourceTree = "<group>"; };
 		37CBBCC915E820590086D8A5 /* mask.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = mask.png; sourceTree = "<group>"; };
+		37DF63CE15E92CE40097DADF /* divider.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = divider.png; sourceTree = "<group>"; };
+		37DF63CF15E92CE40097DADF /* tick.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = tick.png; sourceTree = "<group>"; };
 		76C20238124A529A000F0F70 /* indicator.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = indicator.png; sourceTree = "<group>"; };
 		76C20239124A529A000F0F70 /* indicator@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "indicator@2x.png"; sourceTree = "<group>"; };
 		76EFB41A124789F5003020A7 /* TestViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = TestViewController.h; path = Classes/TestViewController.h; sourceTree = "<group>"; };
@@ -142,6 +146,8 @@
 		76C20237124A5282000F0F70 /* Images */ = {
 			isa = PBXGroup;
 			children = (
+				37DF63CE15E92CE40097DADF /* divider.png */,
+				37DF63CF15E92CE40097DADF /* tick.png */,
 				37CBBCC915E820590086D8A5 /* mask.png */,
 				37CBBCC615E814170086D8A5 /* background.png */,
 				76C20238124A529A000F0F70 /* indicator.png */,
@@ -208,6 +214,8 @@
 				76C2023B124A529A000F0F70 /* indicator@2x.png in Resources */,
 				37CBBCC715E814170086D8A5 /* background.png in Resources */,
 				37CBBCCA15E820590086D8A5 /* mask.png in Resources */,
+				37DF63D015E92CE40097DADF /* divider.png in Resources */,
+				37DF63D115E92CE40097DADF /* tick.png in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

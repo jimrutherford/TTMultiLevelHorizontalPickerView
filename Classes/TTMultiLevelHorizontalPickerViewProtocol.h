@@ -26,6 +26,7 @@
 
 // one of these two methods must be defined
 - (NSString *)multiLevelHorizontalPickerView:(TTMultiLevelHorizontalPickerView *)picker titleForElementAtIndex:(NSInteger)index;
+- (NSString *)multiLevelHorizontalPickerView:(TTMultiLevelHorizontalPickerView *)picker titleForMinorElementAtIndex:(NSInteger)minorIndex withMajorIndex:(NSInteger)majorIndex;
 - (NSArray *)multiLevelHorizontalPickerView:(TTMultiLevelHorizontalPickerView *)picker childrenForElementAtIndex:(NSInteger)index;
 - (UIView *)multiLevelHorizontalPickerView:(TTMultiLevelHorizontalPickerView *)picker viewForElementAtIndex:(NSInteger)index;
 // any view returned from this must confirm to the TTMultiLevelHorizontalPickerElementState protocol
