@@ -25,21 +25,22 @@ int indexCount;
         
         TTItem * javaItem = [TTItem alloc];
         javaItem.itemName = @"Java";
-        javaItem.items = @[@"JavaOne", @"JavaTwo", @"JavaThree"];
+        javaItem.items = @[@"Spring", @"Hibernate", @"Tomcat"];
         
         TTItem * htmlItem = [TTItem alloc];
         htmlItem.itemName = @"HTML";
-        htmlItem.items = @[@"HTMLOne", @"HTMLTwo"];
+        htmlItem.items = @[@"CSS", @"DOM"];
         
         TTItem * objcItem = [TTItem alloc];
         objcItem.itemName = @"Objective-C";
-        
+        objcItem.items = @[@"iOS", @"OSX", @"Cocoa", @"XCode"];
+
         TTItem * javascriptItem = [TTItem alloc];
         javascriptItem.itemName = @"Javascript";
         
         TTItem * rubyItem = [TTItem alloc];
         rubyItem.itemName = @"Ruby";
-        rubyItem.items = @[@"RubyOne", @"RubyTwo", @"RubyThree", @"RubyFour", @"RubyFive"];
+        rubyItem.items = @[@"Gems", @"Rails", @"Active Record", @"Capistrano", @"RSpec"];
 
         TTItem * pythonItem = [TTItem alloc];
         pythonItem.itemName = @"Python";
@@ -70,7 +71,7 @@ int indexCount;
 - (void)viewDidLoad {
 	[super viewDidLoad];
 
-	CGFloat margin = 40.0f;
+	CGFloat margin = 20.0f;
 	CGFloat width = (self.view.bounds.size.width - (margin * 2.0f));
 	CGFloat pickerHeight = 100.0f;
 	CGFloat x = margin;
@@ -94,6 +95,12 @@ int indexCount;
 	UIImageView *indicator = [[UIImageView alloc] initWithImage:[UIImage imageNamed:@"indicator"]];
 	_pickerView.selectionIndicatorView = indicator;
 //	pickerView.indicatorPosition = PickerIndicatorTop; // specify indicator's location
+    
+    UIImageView *minorTick = [[UIImageView alloc] initWithImage:[UIImage imageNamed:@"tick"]];
+	_pickerView.minorTickView = minorTick;
+    
+    UIImageView *divider = [[UIImageView alloc] initWithImage:[UIImage imageNamed:@"divider"]];
+	_pickerView.majorDividerView = divider;
 
 	[self.view addSubview:_pickerView];
 
@@ -104,7 +111,7 @@ int indexCount;
 	[_nextButton addTarget:self action:@selector(nextButtonTapped:) forControlEvents:UIControlEventTouchUpInside];
 	[_nextButton	setTitle:@"Center Element 0" forState:UIControlStateNormal];
 	_nextButton.titleLabel.textColor = [UIColor blackColor];
-	[self.view addSubview:_nextButton];
+	//[self.view addSubview:_nextButton];
 
 	self.reloadButton = [UIButton buttonWithType:UIButtonTypeRoundedRect];
 	y = y + tmpFrame.size.height + spacing;
@@ -112,7 +119,7 @@ int indexCount;
 	_reloadButton.frame = tmpFrame;
 	[_reloadButton addTarget:self action:@selector(reloadButtonTapped:) forControlEvents:UIControlEventTouchUpInside];
 	[_reloadButton setTitle:@"Reload Data" forState:UIControlStateNormal];
-	[self.view addSubview:_reloadButton];
+	//[self.view addSubview:_reloadButton];
 
 	y = y + tmpFrame.size.height + spacing;
 	tmpFrame = CGRectMake(x, y, width, 50.0f);

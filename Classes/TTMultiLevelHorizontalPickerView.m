@@ -30,6 +30,10 @@
 
 @end
 
+#pragma mark - Constants
+static NSInteger const kLabelTagOffset = 100;
+static NSInteger const kDividerTagOffset = 10000;
+static NSInteger const kTickTagOffset = 1000000;
 
 #pragma mark - Implementation
 @implementation TTMultiLevelHorizontalPickerView : UIView
@@ -92,11 +96,12 @@
 
 		// if the view doesn't intersect, it's not visible, so we can recycle it
 		if (!CGRectIntersectsRect(scaledViewFrame, visibleBounds)) {
-			[view removeFromSuperview];
+			//NSLog(@"View type %@", [view description]);
+            [view removeFromSuperview];
 		} else { // if it is still visible, update it's selected state
 			if ([view respondsToSelector:setSelectedSelector]) {
 				// view's tag is it's index
-				BOOL isSelected = (_currentMajorSelectedIndex == [self indexForElement:view]);
+				BOOL isSelected = (_currentMajorSelectedIndex == [self indexForElement:view withType:kLabelTagOffset]);
 				if (isSelected) {
 					// if this view is set to be selected, make sure it is over the selection point
 					int currentIndex = [self nearestMajorElementToCenter];
@@ -117,49 +122,59 @@
 	UIView *view = nil;
 	for (int i = firstNeededElement; i <= lastNeededElement; i++) {
 		view = nil; // paranoia
-		view = [_scrollView viewWithTag:[self tagForElementAtIndex:i]];
+		view = [_scrollView viewWithTag:[self tagForElementAtIndex:i withType:kLabelTagOffset]];
 		if (!view) {
 			if (i < _numberOfElements) { // make sure we are not requesting data out of range
 				if (self.delegate && [self.delegate respondsToSelector:titleForElementSelector]) {
 					NSString *title = [self.delegate multiLevelHorizontalPickerView:self titleForElementAtIndex:i];
 					view = [self labelForForElementAtIndex:i withTitle:title];
                     // use the index as the tag so we can find it later
-					view.tag = [self tagForElementAtIndex:i];
+					view.tag = [self tagForElementAtIndex:i withType:kLabelTagOffset];
 					[_scrollView addSubview:view];
 				} 
-			}
-		}
-    
+            }
+        }
+
         // draw sub elements
-        NSArray * subElements = [self.delegate multiLevelHorizontalPickerView:self childrenForElementAtIndex:i];   
+        NSArray * subElements = [self.delegate multiLevelHorizontalPickerView:self childrenForElementAtIndex:i];
         NSInteger numberOfSubElements = [subElements count];
-    
-        int interval; 
+        
+        int interval;
         if (numberOfSubElements < 2) {
             interval = elementWidth / 2;
             numberOfSubElements = 1;
-
-        }        
+            
+        }
         else {
             interval = elementWidth / (numberOfSubElements + 1);
         }
-    
+        
         int location = interval;
         
         for (int j = 0; j < numberOfSubElements; j++)
         {
-            UIView *subLineView = [[UIView alloc] initWithFrame:CGRectMake(i * elementWidth + location, 0, 1, 30)];
-            subLineView.backgroundColor = [UIColor greenColor];
-            [_scrollView addSubview:subLineView];
+            UIImageView *tick = nil;
+            int tag = (kTickTagOffset * (i+1)) + (j+1);
+            tick = (UIImageView*)[_scrollView viewWithTag:[self tagForElementAtIndex:i withType:tag]];
+            if (!tick) {
+                tick = [[UIImageView alloc] initWithImage:[UIImage imageNamed:@"tick"]];
+                tick.frame = CGRectMake(i * elementWidth + location - (tick.frame.size.width/2), visibleBounds.size.height - tick.frame.size.height, tick.frame.size.width, 30);
+                tick.tag = [self tagForElementAtIndex:i withType:tag];
+                [_scrollView addSubview:tick];
+                
+            }
             location += interval;
         }
-    
-    
-        // draw element divider lines
-        UIView *lineView = [[UIView alloc] initWithFrame:CGRectMake(i * elementWidth, 0, 1, visibleBounds.size.height)];
-        lineView.backgroundColor = [UIColor redColor];
-        [_scrollView addSubview:lineView];
-	} 
+
+        UIImageView *divider = nil;
+        divider = (UIImageView*)[_scrollView viewWithTag:[self tagForElementAtIndex:i withType:kDividerTagOffset]];
+        if (!divider) {
+            divider = [[UIImageView alloc] initWithImage:[UIImage imageNamed:@"divider"]];
+            divider.frame = CGRectMake(i * elementWidth - (divider.frame.size.width/2), 56, divider.frame.size.width, visibleBounds.size.height);
+            divider.tag = [self tagForElementAtIndex:i withType:kDividerTagOffset];
+             [_scrollView addSubview:divider];
+        }
+	}
     
     int majorElement = [self nearestMajorElementToCenter];
     int minorElement = [self nearestMinorElementToPoint:[self currentCenter] withMajorIndex:_currentMajorSelectedIndex];
@@ -275,7 +290,7 @@
 }
 
 - (void)scrollToMinorElement:(NSInteger)minorIndex withMajorElement:(NSInteger) majorIndex animated:(BOOL)animate {
-	_currentMajorSelectedIndex = majorIndex;
+    _currentMajorSelectedIndex = majorIndex;
 	int x = [self centerOfMinorElementAtIndex:minorIndex withMajorIndex:majorIndex] - _selectionPoint.x;
 	[_scrollView setContentOffset:CGPointMake(x, 0) animated:animate];
     
@@ -352,11 +367,9 @@
 	if (_numberOfElements != 0) {
 		CGFloat scrollerWidth = _scrollView.frame.size.width;
 
-		CGFloat halfFirstWidth = 0.0f;
-		CGFloat halfLastWidth  = 0.0f;
+		CGFloat halfWidth = 0.0f;
 		if ( _numberOfElements > 0 ) {
-			halfFirstWidth = elementWidth / 2.0; 
-			halfLastWidth  = elementWidth      / 2.0;
+			halfWidth = elementWidth / 2.0; 
 		}
 
 		// calculating the inset so that the bouncing on the ends happens more smooothly
@@ -371,8 +384,8 @@
 		//  +---------|---------------+
 		//  |####| Element |**********| << UIScrollView
 		//  +-------------------------+
-		CGFloat firstInset = _selectionPoint.x - halfFirstWidth;
-		CGFloat lastInset  = (scrollerWidth - _selectionPoint.x) - halfLastWidth;
+		CGFloat firstInset = _selectionPoint.x - halfWidth;
+		CGFloat lastInset  = (scrollerWidth - _selectionPoint.x) - halfWidth;
 
 		_scrollView.contentInset = UIEdgeInsetsMake(0, firstInset, 0, lastInset);
 	}
@@ -393,13 +406,13 @@
 }
 
 // return the tag for an element at a given index
-- (NSInteger)tagForElementAtIndex:(NSInteger)index {
-	return (index + 1) * 10;
+- (NSInteger)tagForElementAtIndex:(NSInteger)index withType:(NSInteger)type {
+	return (index + 1) * type;
 }
 
 // return the index given an element's tag
-- (NSInteger)indexForElement:(UIView *)element {
-	return (element.tag / 10) - 1;
+- (NSInteger)indexForElement:(UIView *)element withType:(NSInteger)type {
+	return (element.tag / type) - 1;
 }
 
 // what is the center of the element at the given index?
@@ -517,7 +530,10 @@
             tempPoint = distance;
             closestSubElement = i;
         }
-	}    
+	}
+    
+    NSLog(@"closest sub element - %i   MajorIndex - %i", closestSubElement, majorIndex);
+    
 	return closestSubElement;
 }
 
@@ -527,8 +543,7 @@
 - (void)scrollToElementNearestToCenter {
     int majorIndex = [self nearestMajorElementToCenter];
     int minorIndex = [self nearestMinorElementToCenterWithMajorIndex:majorIndex];
-    
-    //[self scrollToMajorElement:majorIndex animated:YES];
+ 
     [self scrollToMinorElement:minorIndex withMajorElement:majorIndex  animated:YES];
 }
 
