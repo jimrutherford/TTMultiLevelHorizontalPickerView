@@ -14,6 +14,8 @@
 	UIScrollView *_scrollView;
     UILabel *_minorElementTitleLabel;
 
+    UIImageView *_selectionIndicatorView;
+    
 	NSInteger elementPadding;
     
     NSInteger elementWidth;
@@ -157,7 +159,7 @@ static NSInteger const kTickTagOffset = 1000000;
             int tag = (kTickTagOffset * (i+1)) + (j+1);
             tick = (UIImageView*)[_scrollView viewWithTag:[self tagForElementAtIndex:i withType:tag]];
             if (!tick) {
-                tick = [[UIImageView alloc] initWithImage:[UIImage imageNamed:@"tick"]];
+                tick = [[UIImageView alloc] initWithImage:[UIImage imageNamed:_minorTickImageName]];
                 tick.frame = CGRectMake(i * elementWidth + location - (tick.frame.size.width/2), visibleBounds.size.height - tick.frame.size.height, tick.frame.size.width, 30);
                 tick.tag = [self tagForElementAtIndex:i withType:tag];
                 [_scrollView addSubview:tick];
@@ -169,7 +171,7 @@ static NSInteger const kTickTagOffset = 1000000;
         UIImageView *divider = nil;
         divider = (UIImageView*)[_scrollView viewWithTag:[self tagForElementAtIndex:i withType:kDividerTagOffset]];
         if (!divider) {
-            divider = [[UIImageView alloc] initWithImage:[UIImage imageNamed:@"divider"]];
+            divider = [[UIImageView alloc] initWithImage:[UIImage imageNamed:_majorDividerImageName]];
             divider.frame = CGRectMake(i * elementWidth - (divider.frame.size.width/2), 56, divider.frame.size.width, visibleBounds.size.height);
             divider.tag = [self tagForElementAtIndex:i withType:kDividerTagOffset];
              [_scrollView addSubview:divider];
@@ -245,23 +247,31 @@ static NSInteger const kTickTagOffset = 1000000;
 }
 
 - (void)drawPositionIndicator {
-	CGRect indicatorFrame = _selectionIndicatorView.frame;
+	[_selectionIndicatorView removeFromSuperview];
+    _selectionIndicatorView = nil;
+    _selectionIndicatorView = [[UIImageView alloc] initWithImage:[UIImage imageNamed:_selectionIndicatorImageName]];
+    
+    CGRect indicatorFrame = _selectionIndicatorView.frame;
 	CGFloat x = self.selectionPoint.x - (indicatorFrame.size.width / 2);
-	CGFloat y;
+	CGFloat y = 0.0f;
     
-	switch (self.indicatorPosition) {
-		case PickerIndicatorTop: {
-			y = 0.0f;
-			break;
-		}
-		case PickerIndicatorBottom: {
-			y = self.frame.size.height - indicatorFrame.size.height;
-			break;
-		}
-		default:
-			break;
-	}
-    
+    if (self.indicatorIsMask) {
+        x = y = 0.0f;
+        
+    } else {
+        switch (self.indicatorPosition) {
+            case PickerIndicatorTop: {
+                y = 0.0f;
+                break;
+            }
+            case PickerIndicatorBottom: {
+                y = self.frame.size.height - indicatorFrame.size.height;
+                break;
+            }
+            default:
+                break;
+        }
+    }
 	// properly place indicator image in view relative to selection point
 	CGRect tmpFrame = CGRectMake(x, y, indicatorFrame.size.width, indicatorFrame.size.height);
 	_selectionIndicatorView.frame = tmpFrame;
@@ -632,32 +642,39 @@ static NSInteger const kTickTagOffset = 1000000;
 	}
 }
 
-- (void)setSelectionIndicatorView:(UIView *)indicatorView {
-	if (_selectionIndicatorView != indicatorView) {
-		if (_selectionIndicatorView) {
+- (void)setIndicatorIsMask:(BOOL)isMask {
+	if (_indicatorIsMask != isMask) {
+		_indicatorIsMask = isMask;
+		[self drawPositionIndicator];
+	}
+}
+
+- (void)setSelectionIndicatorImageName:(NSString *)indicatorImageName {
+	if (_selectionIndicatorImageName != indicatorImageName) {
+		if (_selectionIndicatorImageName) {
 			[_selectionIndicatorView removeFromSuperview];
 		}
-		_selectionIndicatorView = indicatorView;
+		_selectionIndicatorImageName = indicatorImageName;
         
 		[self drawPositionIndicator];
 	}
 }
 
-- (void)setMinorTickView:(UIView *)minorTickView {
-	if (_minorTickView != minorTickView) {
-		if (_minorTickView) {
+- (void)setMinorTickView:(NSString *)minorTickImageName {
+	if (_minorTickImageName != minorTickImageName) {
+		if (_minorTickImageName) {
 			// code to relayout control with new tick
 		}
-		_minorTickView = minorTickView;
+		_minorTickImageName = minorTickImageName;
 	}
 }
 
-- (void)setMajorDividerView:(UIView *)majorDividerView {
-	if (_majorDividerView != majorDividerView) {
-		if (_majorDividerView) {
+- (void)setMajorDividerView:(NSString *)majorDividerImageName {
+	if (_majorDividerImageName != majorDividerImageName) {
+		if (_majorDividerImageName) {
 			// code to relayout control with new divider
 		}
-		_majorDividerView = majorDividerView;
+		_majorDividerImageName = majorDividerImageName;
 	}
 }
 

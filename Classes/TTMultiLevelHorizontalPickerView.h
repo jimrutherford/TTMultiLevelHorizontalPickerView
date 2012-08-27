@@ -35,11 +35,12 @@ typedef enum {
 
 // the point, defaults to center of view, where the selected element sits
 @property (nonatomic, assign) CGPoint selectionPoint;
-@property (nonatomic, retain) UIView *selectionIndicatorView;
-@property (nonatomic, retain) UIView *minorTickView;
-@property (nonatomic, retain) UIView *majorDividerView;
+@property (nonatomic, retain) NSString *selectionIndicatorImageName;
+@property (nonatomic, retain) NSString *minorTickImageName;
+@property (nonatomic, retain) NSString *majorDividerImageName;
 
 @property (nonatomic, assign) PickerIndicatorPosition indicatorPosition;
+@property (nonatomic, assign) BOOL indicatorIsMask;
 
 - (void)reloadData;
 - (void)scrollToMinorElement:(NSInteger)index withMajorElement: (NSInteger) majorIndex animated:(BOOL)animate;

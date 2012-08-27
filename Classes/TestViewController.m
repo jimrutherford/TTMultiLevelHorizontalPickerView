@@ -10,9 +10,9 @@
 
 @implementation TestViewController
 
-#pragma mark - iVars
-
 NSMutableArray * dataArray;
+
+// for next button
 int indexCount;
 
 #pragma mark - Init/Dealloc
@@ -21,7 +21,6 @@ int indexCount;
 	if (self) {
 
 		indexCount = 0;
-        
         
         TTItem * javaItem = [TTItem alloc];
         javaItem.itemName = @"Java";
@@ -71,11 +70,11 @@ int indexCount;
 - (void)viewDidLoad {
 	[super viewDidLoad];
 
-	CGFloat margin = 20.0f;
+	CGFloat margin = 0.0f;
 	CGFloat width = (self.view.bounds.size.width - (margin * 2.0f));
-	CGFloat pickerHeight = 100.0f;
+	CGFloat pickerHeight = 110.0f;
 	CGFloat x = margin;
-	CGFloat y = 50.0f;
+	CGFloat y = 45.0f;
 	CGFloat spacing = 25.0f;
 	CGRect tmpFrame = CGRectMake(x, y, width, pickerHeight);
 
@@ -92,15 +91,12 @@ int indexCount;
 	_pickerView.selectionPoint = CGPointMake(width/2, 0);
 
 	// add carat or other view to indicate selected element
-	UIImageView *indicator = [[UIImageView alloc] initWithImage:[UIImage imageNamed:@"indicator"]];
-	_pickerView.selectionIndicatorView = indicator;
-//	pickerView.indicatorPosition = PickerIndicatorTop; // specify indicator's location
+	_pickerView.selectionIndicatorImageName = @"indicator";
+    _pickerView.indicatorPosition = PickerIndicatorTop; // specify indicator's location
+    _pickerView.indicatorIsMask = NO;
     
-    UIImageView *minorTick = [[UIImageView alloc] initWithImage:[UIImage imageNamed:@"tick"]];
-	_pickerView.minorTickView = minorTick;
-    
-    UIImageView *divider = [[UIImageView alloc] initWithImage:[UIImage imageNamed:@"divider"]];
-	_pickerView.majorDividerView = divider;
+	_pickerView.minorTickImageName = @"tick";
+	_pickerView.majorDividerImageName = @"divider";
 
 	[self.view addSubview:_pickerView];
 
@@ -128,12 +124,6 @@ int indexCount;
 	_infoLabel.textColor = [UIColor whiteColor];
 	_infoLabel.textAlignment = UITextAlignmentCenter;
 	[self.view addSubview:_infoLabel];
-    
-    
-    UIImageView *mask = [[UIImageView alloc] initWithImage:[UIImage imageNamed:@"mask"]];
-    CGRect maskFrame = CGRectMake(0,45,320,110);
-    mask.frame = maskFrame;
-    [self.view addSubview:mask];
     
 }
 
