@@ -16,7 +16,6 @@
 
 @property (nonatomic, retain) TTMultiLevelHorizontalPickerView *pickerView;
 @property (nonatomic, retain) UIButton *nextButton;
-@property (nonatomic, retain) UIButton *reloadButton;
 @property (nonatomic, retain) UILabel *infoLabel;
 
 @end

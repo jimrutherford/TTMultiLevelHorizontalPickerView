@@ -42,7 +42,6 @@ typedef enum {
 @property (nonatomic, assign) PickerIndicatorPosition indicatorPosition;
 @property (nonatomic, assign) BOOL indicatorIsMask;
 
-- (void)reloadData;
 - (void)scrollToMinorElement:(NSInteger)index withMajorElement: (NSInteger) majorIndex animated:(BOOL)animate;
 @end
 

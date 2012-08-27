@@ -160,7 +160,7 @@ static NSInteger const kTickTagOffset = 1000000;
             tick = (UIImageView*)[_scrollView viewWithTag:[self tagForElementAtIndex:i withType:tag]];
             if (!tick) {
                 tick = [[UIImageView alloc] initWithImage:[UIImage imageNamed:_minorTickImageName]];
-                tick.frame = CGRectMake(i * elementWidth + location - (tick.frame.size.width/2), visibleBounds.size.height - tick.frame.size.height, tick.frame.size.width, 30);
+                tick.frame = CGRectMake(i * elementWidth + location - (tick.frame.size.width/2), visibleBounds.size.height - tick.frame.size.height, tick.frame.size.width, tick.frame.size.height);
                 tick.tag = [self tagForElementAtIndex:i withType:tag];
                 [_scrollView addSubview:tick];
                 
@@ -305,9 +305,9 @@ static NSInteger const kTickTagOffset = 1000000;
 	[_scrollView setContentOffset:CGPointMake(x, 0) animated:animate];
     
 	// notify delegate of the selected index
-	SEL delegateCall = @selector(multiLevelHorizontalPickerView:didSelectElementAtIndex:);
+	SEL delegateCall = @selector(multiLevelHorizontalPickerView:didSelectElementAtMajorIndex:withMinorIndex:);
 	if (self.delegate && [self.delegate respondsToSelector:delegateCall]) {
-		[self.delegate multiLevelHorizontalPickerView:self didSelectElementAtIndex:majorIndex];
+		[self.delegate multiLevelHorizontalPickerView:self didSelectElementAtMajorIndex:majorIndex withMinorIndex:minorIndex];
 	}
     
 #if (__IPHONE_OS_VERSION_MAX_ALLOWED > __IPHONE_4_3)
@@ -456,7 +456,7 @@ static NSInteger const kTickTagOffset = 1000000;
 	if (_numberOfElements > index) {
 		width = elementWidth;
 	}
-	return CGRectMake([self offsetForElementAtIndex:index], 0.0f, width, 40);
+	return CGRectMake([self offsetForElementAtIndex:index], 10.0f, width, 40);
 }
 
 // what is the "center", relative to the content offset and adjusted to selection point?
@@ -571,17 +571,6 @@ static NSInteger const kTickTagOffset = 1000000;
 }
 
 #pragma mark - Data Fetching Methods
-- (void)reloadData {
-	// remove all scrollview subviews and "recycle" them
-	for (UIView *view in [_scrollView subviews]) {
-		[view removeFromSuperview];
-	}
-    
-	firstVisibleElement = NSIntegerMax;
-	lastVisibleElement  = NSIntegerMin;
-    
-	[self collectData];
-}
 
 - (void)collectData {
 	scrollSizeHasBeenSet = NO;

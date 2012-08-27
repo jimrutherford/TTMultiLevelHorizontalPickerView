@@ -91,9 +91,9 @@ int indexCount;
 	_pickerView.selectionPoint = CGPointMake(width/2, 0);
 
 	// add carat or other view to indicate selected element
-	_pickerView.selectionIndicatorImageName = @"indicator";
+	_pickerView.selectionIndicatorImageName = @"mask";
     _pickerView.indicatorPosition = PickerIndicatorTop; // specify indicator's location
-    _pickerView.indicatorIsMask = NO;
+    _pickerView.indicatorIsMask = YES;
     
 	_pickerView.minorTickImageName = @"tick";
 	_pickerView.majorDividerImageName = @"divider";
@@ -109,13 +109,6 @@ int indexCount;
 	_nextButton.titleLabel.textColor = [UIColor blackColor];
 	//[self.view addSubview:_nextButton];
 
-	self.reloadButton = [UIButton buttonWithType:UIButtonTypeRoundedRect];
-	y = y + tmpFrame.size.height + spacing;
-	tmpFrame = CGRectMake(x, y, width, 50.0f);
-	_reloadButton.frame = tmpFrame;
-	[_reloadButton addTarget:self action:@selector(reloadButtonTapped:) forControlEvents:UIControlEventTouchUpInside];
-	[_reloadButton setTitle:@"Reload Data" forState:UIControlStateNormal];
-	//[self.view addSubview:_reloadButton];
 
 	y = y + tmpFrame.size.height + spacing;
 	tmpFrame = CGRectMake(x, y, width, 50.0f);
@@ -170,11 +163,6 @@ int indexCount;
 	_nextButton.frame = tmpFrame;
 	
 	y = y + tmpFrame.size.height + spacing;
-	tmpFrame = _reloadButton.frame;
-	tmpFrame.origin.y = y;
-	_reloadButton.frame = tmpFrame;
-	
-	y = y + tmpFrame.size.height + spacing;
 	tmpFrame = _infoLabel.frame;
 	tmpFrame.origin.y = y;
 	_infoLabel.frame = tmpFrame;
@@ -192,14 +180,6 @@ int indexCount;
 				forState:UIControlStateNormal];
 }
 
-- (void)reloadButtonTapped:(id)sender {
-	// change our title array so we can see a change
-	if ([dataArray count] > 1) {
-		[dataArray removeLastObject];
-	}
-
-	[_pickerView reloadData];
-}
 
 #pragma mark - HorizontalPickerView DataSource Methods
 - (NSInteger)numberOfElementsInHorizontalPickerView:(TTMultiLevelHorizontalPickerView *)picker {
@@ -224,8 +204,8 @@ int indexCount;
     return item.items;
 }
 
-- (void)multiLevelHorizontalPickerView:(TTMultiLevelHorizontalPickerView *)picker didSelectElementAtIndex:(NSInteger)index {
-	self.infoLabel.text = [NSString stringWithFormat:@"Selected index %d", index];
+- (void)multiLevelHorizontalPickerView:(TTMultiLevelHorizontalPickerView *)picker didSelectElementAtMajorIndex:(NSInteger)majorIndex withMinorIndex:(NSInteger)minorIndex {
+	self.infoLabel.text = [NSString stringWithFormat:@"Selected major %d & minor %d index", majorIndex, minorIndex];
 }
 
 @end
