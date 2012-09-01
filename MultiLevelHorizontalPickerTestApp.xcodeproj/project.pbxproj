@@ -15,7 +15,6 @@
 		370636B315E7DEAF008A9A08 /* TTPickerLabel.m in Sources */ = {isa = PBXBuildFile; fileRef = 370636B215E7DEAF008A9A08 /* TTPickerLabel.m */; };
 		3732A3BF15A4EE400092A709 /* TTMultiLevelHorizontalPickerView.m in Sources */ = {isa = PBXBuildFile; fileRef = 3732A3BD15A4EE400092A709 /* TTMultiLevelHorizontalPickerView.m */; };
 		374197F815A91DC100825129 /* AppDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = 374197F715A91DC100825129 /* AppDelegate.m */; };
-		37733247159BD1B300171BBA /* TTItem.m in Sources */ = {isa = PBXBuildFile; fileRef = 37733246159BD1B300171BBA /* TTItem.m */; };
 		37CBBCC715E814170086D8A5 /* background.png in Resources */ = {isa = PBXBuildFile; fileRef = 37CBBCC615E814170086D8A5 /* background.png */; };
 		37CBBCCA15E820590086D8A5 /* mask.png in Resources */ = {isa = PBXBuildFile; fileRef = 37CBBCC915E820590086D8A5 /* mask.png */; };
 		37DF63D015E92CE40097DADF /* divider.png in Resources */ = {isa = PBXBuildFile; fileRef = 37DF63CE15E92CE40097DADF /* divider.png */; };
@@ -40,8 +39,6 @@
 		3732A3BD15A4EE400092A709 /* TTMultiLevelHorizontalPickerView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = TTMultiLevelHorizontalPickerView.m; sourceTree = "<group>"; };
 		3732A3BE15A4EE400092A709 /* TTMultiLevelHorizontalPickerViewProtocol.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = TTMultiLevelHorizontalPickerViewProtocol.h; sourceTree = "<group>"; };
 		374197F715A91DC100825129 /* AppDelegate.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = AppDelegate.m; path = Classes/AppDelegate.m; sourceTree = "<group>"; };
-		37733245159BD1B300171BBA /* TTItem.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = TTItem.h; path = Classes/TTItem.h; sourceTree = "<group>"; };
-		37733246159BD1B300171BBA /* TTItem.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = TTItem.m; path = Classes/TTItem.m; sourceTree = "<group>"; };
 		37CBBCC615E814170086D8A5 /* background.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = background.png; sourceTree = "<group>"; };
 		37CBBCC915E820590086D8A5 /* mask.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = mask.png; sourceTree = "<group>"; };
 		37DF63CE15E92CE40097DADF /* divider.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = divider.png; sourceTree = "<group>"; };
@@ -78,7 +75,6 @@
 		29B97314FDCFA39411CA2CEA /* CustomTemplate */ = {
 			isa = PBXGroup;
 			children = (
-				37733249159BD1C000171BBA /* Model */,
 				76321F0F15051FDE00FACD9F /* MultiLevelPickerView */,
 				76EFB41A124789F5003020A7 /* TestViewController.h */,
 				76EFB41B124789F5003020A7 /* TestViewController.m */,
@@ -119,15 +115,6 @@
 				288765FC0DF74451002DB57D /* CoreGraphics.framework */,
 			);
 			name = Frameworks;
-			sourceTree = "<group>";
-		};
-		37733249159BD1C000171BBA /* Model */ = {
-			isa = PBXGroup;
-			children = (
-				37733245159BD1B300171BBA /* TTItem.h */,
-				37733246159BD1B300171BBA /* TTItem.m */,
-			);
-			name = Model;
 			sourceTree = "<group>";
 		};
 		76321F0F15051FDE00FACD9F /* MultiLevelPickerView */ = {
@@ -228,7 +215,6 @@
 			files = (
 				1D60589B0D05DD56006BFB54 /* main.m in Sources */,
 				76EFB41D124789F5003020A7 /* TestViewController.m in Sources */,
-				37733247159BD1B300171BBA /* TTItem.m in Sources */,
 				3732A3BF15A4EE400092A709 /* TTMultiLevelHorizontalPickerView.m in Sources */,
 				374197F815A91DC100825129 /* AppDelegate.m in Sources */,
 				370636B315E7DEAF008A9A08 /* TTPickerLabel.m in Sources */,

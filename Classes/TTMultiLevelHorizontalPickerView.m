@@ -7,7 +7,6 @@
 
 #import "TTMultiLevelHorizontalPickerView.h"
 #import "TTPickerLabel.h"
-#import "TTItem.h"
 
 #pragma mark - Internal Method Interface
 @interface TTMultiLevelHorizontalPickerView () {

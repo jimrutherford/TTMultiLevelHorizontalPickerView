@@ -6,7 +6,6 @@
 //
 
 #import "TestViewController.h"
-#import "TTItem.h"
 
 @implementation TestViewController
 
@@ -22,39 +21,18 @@ int indexCount;
 
 		indexCount = 0;
         
-        TTItem * javaItem = [TTItem alloc];
-        javaItem.itemName = @"Java";
-        javaItem.items = @[@"Spring", @"Hibernate", @"Tomcat"];
+        dataArray = [[NSMutableArray alloc] init];
         
-        TTItem * htmlItem = [TTItem alloc];
-        htmlItem.itemName = @"HTML";
-        htmlItem.items = @[@"CSS", @"DOM"];
+        [dataArray addObject:[NSDictionary dictionaryWithObject:@[@"Spring", @"Hibernate", @"Tomcat"]forKey:@"Java"]];
+        [dataArray addObject:[NSDictionary dictionaryWithObject:@[@"CSS", @"DOM"]forKey:@"HTML"]];
+        [dataArray addObject:[NSDictionary dictionaryWithObject:@[@"iOS", @"OSX", @"Cocoa", @"XCode"]forKey:@"Objective-C"]];
+        [dataArray addObject:[NSDictionary dictionaryWithObject:@[]forKey:@"Javascript"]];
+        [dataArray addObject:[NSDictionary dictionaryWithObject:@[@"Gems", @"Rails", @"Active Record", @"Capistrano", @"RSpec"]forKey:@"Ruby"]];
+        [dataArray addObject:[NSDictionary dictionaryWithObject:@[]forKey:@"Python"]];
+        [dataArray addObject:[NSDictionary dictionaryWithObject:@[]forKey:@"C++"]];
+        [dataArray addObject:[NSDictionary dictionaryWithObject:@[]forKey:@"Shell"]];
+        [dataArray addObject:[NSDictionary dictionaryWithObject:@[]forKey:@"PHP"]];
         
-        TTItem * objcItem = [TTItem alloc];
-        objcItem.itemName = @"Objective-C";
-        objcItem.items = @[@"iOS", @"OSX", @"Cocoa", @"XCode"];
-
-        TTItem * javascriptItem = [TTItem alloc];
-        javascriptItem.itemName = @"Javascript";
-        
-        TTItem * rubyItem = [TTItem alloc];
-        rubyItem.itemName = @"Ruby";
-        rubyItem.items = @[@"Gems", @"Rails", @"Active Record", @"Capistrano", @"RSpec"];
-
-        TTItem * pythonItem = [TTItem alloc];
-        pythonItem.itemName = @"Python";
-        
-        TTItem * cItem = [TTItem alloc];
-        cItem.itemName = @"C++";
-        
-        TTItem * shellItem = [TTItem alloc];
-        shellItem.itemName = @"Shell";
-        
-        TTItem * phpItem = [TTItem alloc];
-        phpItem.itemName = @"PHP";
-        
-        dataArray = [NSMutableArray arrayWithObjects: javaItem, htmlItem, objcItem, javascriptItem, rubyItem, pythonItem, cItem, shellItem, phpItem, nil];
-
         NSLog(@"Hello %d", [dataArray count]);
 	}
 	return self;
@@ -187,21 +165,33 @@ int indexCount;
 }
 
 #pragma mark - MultiLevelHorizontalPickerView Delegate Methods
-- (NSString *)multiLevelHorizontalPickerView:(TTMultiLevelHorizontalPickerView *)picker titleForElementAtIndex:(NSInteger)index {
-	TTItem * item = [dataArray objectAtIndex:index];
-    return item.itemName;
-}
-
 #pragma mark - MultiLevelHorizontalPickerView Delegate Methods
-- (NSString *)multiLevelHorizontalPickerView:(TTMultiLevelHorizontalPickerView *)picker titleForMinorElementAtIndex:(NSInteger)minorIndex withMajorIndex:(NSInteger)majorIndex {
-	TTItem * item = [dataArray objectAtIndex:majorIndex];
-    return [item.items objectAtIndex:minorIndex];
+
+- (NSString *)multiLevelHorizontalPickerView:(TTMultiLevelHorizontalPickerView *)picker titleForElementAtIndex:(NSInteger)index {
+    
+    NSDictionary * item = [dataArray objectAtIndex:index];
+    NSArray *keys = [item allKeys];
+    return [keys objectAtIndex:0];
 }
 
+- (NSString *)multiLevelHorizontalPickerView:(TTMultiLevelHorizontalPickerView *)picker titleForMinorElementAtIndex:(NSInteger)minorIndex withMajorIndex:(NSInteger)majorIndex {
+    
+    NSDictionary * item = [dataArray objectAtIndex:majorIndex];
+    NSArray *keys = [item allKeys];
+    NSArray * list = [item valueForKey:[keys objectAtIndex:0]];
+    
+    if (list.count > 0) {
+        return [list objectAtIndex:minorIndex];
+    } else {
+        return@"";
+    }
+}
 
 - (NSArray *)multiLevelHorizontalPickerView:(TTMultiLevelHorizontalPickerView *)picker childrenForElementAtIndex:(NSInteger)index {
-	TTItem * item = [dataArray objectAtIndex:index];
-    return item.items;
+    NSDictionary * item = [dataArray objectAtIndex:index];
+    NSArray *keys = [item allKeys];
+    return [item valueForKey:[keys objectAtIndex:0]];
+    
 }
 
 - (void)multiLevelHorizontalPickerView:(TTMultiLevelHorizontalPickerView *)picker didSelectElementAtMajorIndex:(NSInteger)majorIndex withMinorIndex:(NSInteger)minorIndex {
