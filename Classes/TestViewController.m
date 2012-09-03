@@ -6,6 +6,9 @@
 //
 
 #import "TestViewController.h"
+#import "JSONKit.h"
+#import "AFNetworking.h"
+
 
 @implementation TestViewController
 
@@ -23,17 +26,46 @@ int indexCount;
         
         dataArray = [[NSMutableArray alloc] init];
         
-        [dataArray addObject:[NSDictionary dictionaryWithObject:@[@"Spring", @"Hibernate", @"Tomcat"]forKey:@"Java"]];
-        [dataArray addObject:[NSDictionary dictionaryWithObject:@[@"CSS", @"DOM"]forKey:@"HTML"]];
-        [dataArray addObject:[NSDictionary dictionaryWithObject:@[@"iOS", @"OSX", @"Cocoa", @"XCode"]forKey:@"Objective-C"]];
-        [dataArray addObject:[NSDictionary dictionaryWithObject:@[]forKey:@"Javascript"]];
-        [dataArray addObject:[NSDictionary dictionaryWithObject:@[@"Gems", @"Rails", @"Active Record", @"Capistrano", @"RSpec"]forKey:@"Ruby"]];
-        [dataArray addObject:[NSDictionary dictionaryWithObject:@[]forKey:@"Python"]];
-        [dataArray addObject:[NSDictionary dictionaryWithObject:@[]forKey:@"C++"]];
-        [dataArray addObject:[NSDictionary dictionaryWithObject:@[]forKey:@"Shell"]];
-        [dataArray addObject:[NSDictionary dictionaryWithObject:@[]forKey:@"PHP"]];
         
-        NSLog(@"Hello %d", [dataArray count]);
+//        dataArray = [[NSMutableArray alloc] init];
+//        
+//        [dataArray addObject:[NSDictionary dictionaryWithObject:@[@"Spring", @"Hibernate", @"Tomcat"]forKey:@"Java"]];
+//        [dataArray addObject:[NSDictionary dictionaryWithObject:@[@"CSS", @"DOM"]forKey:@"HTML"]];
+//        [dataArray addObject:[NSDictionary dictionaryWithObject:@[@"iOS", @"OSX", @"Cocoa", @"XCode"]forKey:@"Objective-C"]];
+//        [dataArray addObject:[NSDictionary dictionaryWithObject:@[]forKey:@"Javascript"]];
+//        [dataArray addObject:[NSDictionary dictionaryWithObject:@[@"Gems", @"Rails", @"Active Record", @"Capistrano", @"RSpec"]forKey:@"Ruby"]];
+//        [dataArray addObject:[NSDictionary dictionaryWithObject:@[]forKey:@"Python"]];
+//        [dataArray addObject:[NSDictionary dictionaryWithObject:@[]forKey:@"C++"]];
+//        [dataArray addObject:[NSDictionary dictionaryWithObject:@[]forKey:@"Shell"]];
+//        [dataArray addObject:[NSDictionary dictionaryWithObject:@[]forKey:@"PHP"]];
+        
+        
+        
+        NSString *dataURL = @"http://localhost:8888/data/demo.json";
+        
+        
+        NSURL *url = [[NSURL alloc] initWithString:dataURL];
+        NSURLRequest *request = [[NSURLRequest alloc] initWithURL:url];
+        
+        AFHTTPRequestOperation *operation = [[AFHTTPRequestOperation alloc] initWithRequest:request];
+        
+        [operation setCompletionBlockWithSuccess:^(AFHTTPRequestOperation *operation, id responseObject) {
+            NSLog(@"JSON");
+            NSLog(@"%@", operation.responseString);
+            
+            dataArray = [operation.responseString objectFromJSONString];
+            
+            NSLog(@"count %d", [dataArray count]);
+            
+            
+            [_pickerView reloadData];
+            
+        }failure:^(AFHTTPRequestOperation *operation, NSError *error) {
+            NSLog(@"error: %@",  operation.responseString);
+        }];
+        
+        [operation start];
+
 	}
 	return self;
 }
@@ -176,22 +208,29 @@ int indexCount;
 
 - (NSString *)multiLevelHorizontalPickerView:(TTMultiLevelHorizontalPickerView *)picker titleForMinorElementAtIndex:(NSInteger)minorIndex withMajorIndex:(NSInteger)majorIndex {
     
-    NSDictionary * item = [dataArray objectAtIndex:majorIndex];
-    NSArray *keys = [item allKeys];
-    NSArray * list = [item valueForKey:[keys objectAtIndex:0]];
-    
-    if (list.count > 0) {
-        return [list objectAtIndex:minorIndex];
+    if ([dataArray count]>0) {
+        NSDictionary * item = [dataArray objectAtIndex:majorIndex];
+        NSArray *keys = [item allKeys];
+        NSArray * list = [item valueForKey:[keys objectAtIndex:0]];       
+        
+        if (list.count > 0) {
+            return [list objectAtIndex:minorIndex];
+        } else {
+            return@"";
+        }
     } else {
-        return@"";
+        return @"";
     }
 }
 
 - (NSArray *)multiLevelHorizontalPickerView:(TTMultiLevelHorizontalPickerView *)picker childrenForElementAtIndex:(NSInteger)index {
-    NSDictionary * item = [dataArray objectAtIndex:index];
-    NSArray *keys = [item allKeys];
-    return [item valueForKey:[keys objectAtIndex:0]];
-    
+    if ([dataArray count] > 0) {
+        NSDictionary * item = [dataArray objectAtIndex:index];
+        NSArray *keys = [item allKeys];
+        return [item valueForKey:[keys objectAtIndex:0]];
+    } else {
+        return @[];
+    }
 }
 
 - (void)multiLevelHorizontalPickerView:(TTMultiLevelHorizontalPickerView *)picker didSelectElementAtMajorIndex:(NSInteger)majorIndex withMinorIndex:(NSInteger)minorIndex {

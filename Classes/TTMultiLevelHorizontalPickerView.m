@@ -49,7 +49,7 @@ static NSInteger const kTickTagOffset = 1000000;
 		self.textColor   = [UIColor blackColor];
 		self.elementFont = [UIFont systemFontOfSize:12.0f];
 
-		_currentMajorSelectedIndex = -1; // nothing is selected yet
+		
         
         elementWidth = 100;
         
@@ -65,7 +65,8 @@ static NSInteger const kTickTagOffset = 1000000;
 
 		firstVisibleElement = -1;
 		lastVisibleElement  = -1;
-
+        _currentMajorSelectedIndex = -1; // nothing is selected yet
+        
 		self.autoresizesSubviews = YES;
 	}
 	return self;
@@ -177,8 +178,13 @@ static NSInteger const kTickTagOffset = 1000000;
         }
 	}
     
-    int majorElement = [self nearestMajorElementToCenter];
-    int minorElement = [self nearestMinorElementToPoint:[self currentCenter] withMajorIndex:_currentMajorSelectedIndex];
+    int majorElement = 0;
+    int minorElement = 0;
+    
+    if(_currentMajorSelectedIndex > -1) {
+        majorElement = [self nearestMajorElementToCenter];
+        minorElement = [self nearestMinorElementToPoint:[self currentCenter] withMajorIndex:_currentMajorSelectedIndex];
+    }
     
     SEL titleForMinorElementSelector = @selector(multiLevelHorizontalPickerView:titleForMinorElementAtIndex:withMajorIndex:);
     
@@ -187,6 +193,7 @@ static NSInteger const kTickTagOffset = 1000000;
         
         _minorElementTitleLabel.text = title;
     }
+    
     
 	// save off what's visible now
 	firstVisibleElement = firstNeededElement;
@@ -513,6 +520,7 @@ static NSInteger const kTickTagOffset = 1000000;
 
 // what is the element nearest to the given point?
 - (NSInteger)nearestMinorElementToPoint:(CGPoint)point withMajorIndex:(NSInteger)majorIndex  {
+    
     NSArray * subElements = [self.delegate multiLevelHorizontalPickerView:self childrenForElementAtIndex:majorIndex];
     NSInteger numberOfSubElements = [subElements count];
     
@@ -539,10 +547,7 @@ static NSInteger const kTickTagOffset = 1000000;
             tempPoint = distance;
             closestSubElement = i;
         }
-	}
-    
-    NSLog(@"closest sub element - %i   MajorIndex - %i", closestSubElement, majorIndex);
-    
+	}   
 	return closestSubElement;
 }
 
@@ -550,6 +555,7 @@ static NSInteger const kTickTagOffset = 1000000;
 
 // move scroll view to position nearest element under the center
 - (void)scrollToElementNearestToCenter {
+
     int majorIndex = [self nearestMajorElementToCenter];
     int minorIndex = [self nearestMinorElementToCenterWithMajorIndex:majorIndex];
  
@@ -570,6 +576,19 @@ static NSInteger const kTickTagOffset = 1000000;
 }
 
 #pragma mark - Data Fetching Methods
+- (void)reloadData {
+	// remove all scrollview subviews and "recycle" them
+	for (UIView *view in [_scrollView subviews]) {
+		[view removeFromSuperview];
+	}
+    
+    firstVisibleElement = -1;
+    lastVisibleElement  = -1;
+    _currentMajorSelectedIndex = -1; // nothing is selected yet
+    
+	[self collectData];
+}
+
 
 - (void)collectData {
 	scrollSizeHasBeenSet = NO;
@@ -581,6 +600,7 @@ static NSInteger const kTickTagOffset = 1000000;
     
 	dataHasBeenLoaded = YES;
 	[self setNeedsLayout];
+    [self scrollToMinorElement:0 withMajorElement:0  animated:NO];
 }
 
 #pragma mark - DataSource Calling Method (Internal Method)
