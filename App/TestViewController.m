@@ -26,48 +26,51 @@ int indexCount;
         
         dataArray = [[NSMutableArray alloc] init];
         
-        
-//        dataArray = [[NSMutableArray alloc] init];
-//        
-//        [dataArray addObject:[NSDictionary dictionaryWithObject:@[@"Spring", @"Hibernate", @"Tomcat"]forKey:@"Java"]];
-//        [dataArray addObject:[NSDictionary dictionaryWithObject:@[@"CSS", @"DOM"]forKey:@"HTML"]];
-//        [dataArray addObject:[NSDictionary dictionaryWithObject:@[@"iOS", @"OSX", @"Cocoa", @"XCode"]forKey:@"Objective-C"]];
-//        [dataArray addObject:[NSDictionary dictionaryWithObject:@[]forKey:@"Javascript"]];
-//        [dataArray addObject:[NSDictionary dictionaryWithObject:@[@"Gems", @"Rails", @"Active Record", @"Capistrano", @"RSpec"]forKey:@"Ruby"]];
-//        [dataArray addObject:[NSDictionary dictionaryWithObject:@[]forKey:@"Python"]];
-//        [dataArray addObject:[NSDictionary dictionaryWithObject:@[]forKey:@"C++"]];
-//        [dataArray addObject:[NSDictionary dictionaryWithObject:@[]forKey:@"Shell"]];
-//        [dataArray addObject:[NSDictionary dictionaryWithObject:@[]forKey:@"PHP"]];
-        
-        
-        
-        NSString *dataURL = @"http://localhost:8888/data/demo.json";
-        
-        
-        NSURL *url = [[NSURL alloc] initWithString:dataURL];
-        NSURLRequest *request = [[NSURLRequest alloc] initWithURL:url];
-        
-        AFHTTPRequestOperation *operation = [[AFHTTPRequestOperation alloc] initWithRequest:request];
-        
-        [operation setCompletionBlockWithSuccess:^(AFHTTPRequestOperation *operation, id responseObject) {
-            NSLog(@"JSON");
-            NSLog(@"%@", operation.responseString);
-            
-            dataArray = [operation.responseString objectFromJSONString];
-            
-            NSLog(@"count %d", [dataArray count]);
-            
-            
-            [_pickerView reloadData];
-            
-        }failure:^(AFHTTPRequestOperation *operation, NSError *error) {
-            NSLog(@"error: %@",  operation.responseString);
-        }];
-        
-        [operation start];
-
+        //[self loadMockData];
+        [self loadDataFromService];
 	}
 	return self;
+}
+
+- (void) loadMockData {
+    [dataArray addObject:[NSDictionary dictionaryWithObject:@[@"Spring", @"Hibernate", @"Tomcat"]forKey:@"Java"]];
+    [dataArray addObject:[NSDictionary dictionaryWithObject:@[@"CSS", @"DOM"]forKey:@"HTML"]];
+    [dataArray addObject:[NSDictionary dictionaryWithObject:@[@"iOS", @"OSX", @"Cocoa", @"XCode"]forKey:@"Objective-C"]];
+    [dataArray addObject:[NSDictionary dictionaryWithObject:@[]forKey:@"Javascript"]];
+    [dataArray addObject:[NSDictionary dictionaryWithObject:@[@"Gems", @"Rails", @"Active Record", @"Capistrano", @"RSpec"]forKey:@"Ruby"]];
+    [dataArray addObject:[NSDictionary dictionaryWithObject:@[]forKey:@"Python"]];
+    [dataArray addObject:[NSDictionary dictionaryWithObject:@[]forKey:@"C++"]];
+    [dataArray addObject:[NSDictionary dictionaryWithObject:@[]forKey:@"Shell"]];
+    [dataArray addObject:[NSDictionary dictionaryWithObject:@[]forKey:@"PHP"]];
+    
+    NSLog(@"%@", [dataArray JSONString]);
+}
+
+- (void) loadDataFromService {
+    NSString *dataURL = @"http://localhost:8888/data/demo.json";
+    
+    
+    NSURL *url = [[NSURL alloc] initWithString:dataURL];
+    NSURLRequest *request = [[NSURLRequest alloc] initWithURL:url];
+    
+    AFHTTPRequestOperation *operation = [[AFHTTPRequestOperation alloc] initWithRequest:request];
+    
+    [operation setCompletionBlockWithSuccess:^(AFHTTPRequestOperation *operation, id responseObject) {
+        NSLog(@"JSON");
+        NSLog(@"%@", operation.responseString);
+        
+        dataArray = [operation.responseString objectFromJSONString];
+        
+        NSLog(@"count %d", [dataArray count]);
+        
+        
+        [_pickerView reloadData];
+        
+    }failure:^(AFHTTPRequestOperation *operation, NSError *error) {
+        NSLog(@"error: %@",  operation.responseString);
+    }];
+    
+    [operation start];
 }
 
 - (void)didReceiveMemoryWarning {
@@ -144,7 +147,7 @@ int indexCount;
 }
 
 - (BOOL)shouldAutorotateToInterfaceOrientation:(UIInterfaceOrientation)interfaceOrientation {
-	return NO;
+	return YES;
 }
 
 - (void)didRotateFromInterfaceOrientation:(UIInterfaceOrientation)fromInterfaceOrientation {
