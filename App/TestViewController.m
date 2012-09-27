@@ -26,8 +26,8 @@ int indexCount;
         
         dataArray = [[NSMutableArray alloc] init];
         
-        //[self loadMockData];
-        [self loadDataFromService];
+        [self loadMockData];
+        //[self loadDataFromService];
 	}
 	return self;
 }
