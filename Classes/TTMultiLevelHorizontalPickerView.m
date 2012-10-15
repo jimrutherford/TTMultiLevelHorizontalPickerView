@@ -11,19 +11,19 @@
 #pragma mark - Internal Method Interface
 @interface TTMultiLevelHorizontalPickerView () {
 	UIScrollView *_scrollView;
-    UILabel *_minorElementTitleLabel;
-
-    UIImageView *_selectionIndicatorView;
+	UILabel *_minorElementTitleLabel;
+    
+	UIImageView *_selectionIndicatorView;
     
 	NSInteger elementPadding;
     
-    NSInteger elementWidth;
+	NSInteger elementWidth;
     
 	// state keepers
 	BOOL dataHasBeenLoaded;
 	BOOL scrollSizeHasBeenSet;
 	BOOL scrollingBasedOnUserInteraction;
-
+    
 	// keep track of which elements are visible for tiling
 	int firstVisibleElement;
 	int lastVisibleElement;
@@ -42,30 +42,28 @@ static NSInteger const kTickTagOffset = 1000000;
 #pragma mark - Init/Dealloc
 - (id)initWithFrame:(CGRect)frame {
 	if ((self = [super initWithFrame:frame])) {
-
+        
 		[self addScrollView];
-        [self addMinorItemTitleLabel];
-
+		[self addMinorItemTitleLabel];
+        
 		self.textColor   = [UIColor blackColor];
 		self.elementFont = [UIFont systemFontOfSize:12.0f];
 
-		
-        
-        elementWidth = 100;
+		elementWidth = 100;
         
 		_numberOfElements     = 0;
 		elementPadding       = 0;
 		dataHasBeenLoaded    = NO;
 		scrollSizeHasBeenSet = NO;
 		scrollingBasedOnUserInteraction = NO;
-
+        
 		// default to the center
 		_selectionPoint = CGPointMake(frame.size.width / 2, 0.0f);
 		_indicatorPosition = PickerIndicatorBottom;
-
+        
 		firstVisibleElement = -1;
 		lastVisibleElement  = -1;
-        _currentMajorSelectedIndex = -1; // nothing is selected yet
+		_currentMajorSelectedIndex = -1; // nothing is selected yet
         
 		self.autoresizesSubviews = YES;
 	}
@@ -76,7 +74,7 @@ static NSInteger const kTickTagOffset = 1000000;
 - (void)layoutSubviews {
 	[super layoutSubviews];
 	BOOL adjustWhenFinished = NO;
-
+    
 	if (!dataHasBeenLoaded) {
 		[self collectData];
 	}
@@ -85,17 +83,17 @@ static NSInteger const kTickTagOffset = 1000000;
 		[self updateScrollContentInset];
 		[self setTotalWidthOfScrollContent];
 	}
-
+    
 	SEL titleForElementSelector = @selector(multiLevelHorizontalPickerView:titleForElementAtIndex:);
 	SEL setSelectedSelector     = @selector(setSelectedElement:);
-
+    
 	CGRect visibleBounds   = [self bounds];
 	CGRect scaledViewFrame = CGRectZero;
-
+    
 	// remove any subviews that are no longer visible
 	for (UIView *view in [_scrollView subviews]) {
 		scaledViewFrame = [_scrollView convertRect:[view frame] toView:self];
-
+        
 		// if the view doesn't intersect, it's not visible, so we can recycle it
 		if (!CGRectIntersectsRect(scaledViewFrame, visibleBounds)) {
 			//NSLog(@"View type %@", [view description]);
@@ -119,7 +117,7 @@ static NSInteger const kTickTagOffset = 1000000;
 	CGPoint offset = _scrollView.contentOffset;
 	int firstNeededElement = [self nearestMajorElementToPoint:CGPointMake(offset.x, 0.0f)];
 	int lastNeededElement  = [self nearestMajorElementToPoint:CGPointMake(offset.x + visibleBounds.size.width, 0.0f)];
-
+    
 	// add any views that have become visible
 	UIView *view = nil;
 	for (int i = firstNeededElement; i <= lastNeededElement; i++) {
@@ -130,13 +128,13 @@ static NSInteger const kTickTagOffset = 1000000;
 				if (self.delegate && [self.delegate respondsToSelector:titleForElementSelector]) {
 					NSString *title = [self.delegate multiLevelHorizontalPickerView:self titleForElementAtIndex:i];
 					view = [self labelForForElementAtIndex:i withTitle:title];
-                    // use the index as the tag so we can find it later
+					// use the index as the tag so we can find it later
 					view.tag = [self tagForElementAtIndex:i withType:kLabelTagOffset];
 					[_scrollView addSubview:view];
-				} 
+				}
             }
         }
-
+        
         // draw sub elements
         NSArray * subElements = [self.delegate multiLevelHorizontalPickerView:self childrenForElementAtIndex:i];
         NSInteger numberOfSubElements = [subElements count];
@@ -167,14 +165,14 @@ static NSInteger const kTickTagOffset = 1000000;
             }
             location += interval;
         }
-
+        
         UIImageView *divider = nil;
         divider = (UIImageView*)[_scrollView viewWithTag:[self tagForElementAtIndex:i withType:kDividerTagOffset]];
         if (!divider) {
             divider = [[UIImageView alloc] initWithImage:[UIImage imageNamed:_majorDividerImageName]];
             divider.frame = CGRectMake(i * elementWidth - (divider.frame.size.width/2), 56, divider.frame.size.width, visibleBounds.size.height);
             divider.tag = [self tagForElementAtIndex:i withType:kDividerTagOffset];
-             [_scrollView addSubview:divider];
+            [_scrollView addSubview:divider];
         }
 	}
     
@@ -183,7 +181,7 @@ static NSInteger const kTickTagOffset = 1000000;
     
     if(_currentMajorSelectedIndex > -1) {
         majorElement = [self nearestMajorElementToCenter];
-        minorElement = [self nearestMinorElementToPoint:[self currentCenter] withMajorIndex:_currentMajorSelectedIndex];
+        minorElement = [self nearestMinorElementToPoint:[self currentCenter] withMajorIndex:majorElement];
     }
     
     SEL titleForMinorElementSelector = @selector(multiLevelHorizontalPickerView:titleForMinorElementAtIndex:withMajorIndex:);
@@ -193,12 +191,11 @@ static NSInteger const kTickTagOffset = 1000000;
         
         _minorElementTitleLabel.text = title;
     }
-    
-    
+
 	// save off what's visible now
 	firstVisibleElement = firstNeededElement;
 	lastVisibleElement  = lastNeededElement;
-
+    
 	// determine if scroll view needs to shift in response to resizing?
 	if (_currentMajorSelectedIndex > -1 && [self centerOfMinorElementAtIndex:0 withMajorIndex:_currentMajorSelectedIndex] != [self currentCenter].x) {
 		if (adjustWhenFinished) {
@@ -247,7 +244,7 @@ static NSInteger const kTickTagOffset = 1000000;
         _minorElementTitleLabel.textAlignment = UITextAlignmentCenter;
         _minorElementTitleLabel.font = [UIFont boldSystemFontOfSize:14.0f];;
         _minorElementTitleLabel.textColor = [UIColor whiteColor];
-
+        
         [self addSubview:_minorElementTitleLabel];
     }
 }
@@ -327,11 +324,11 @@ static NSInteger const kTickTagOffset = 1000000;
 		// NOTE: sizing and/or changing orientation of control might cause scrolling
 		//		 not initiated by user. do not update current selection in these
 		//		 cases so that the view state is properly preserved.
-
+        
 		// set the current item under the center to "highlighted" or current
 		_currentMajorSelectedIndex = [self nearestMajorElementToCenter];
 	}
-
+    
 #if (__IPHONE_OS_VERSION_MAX_ALLOWED > __IPHONE_4_3)
 	[self setNeedsLayout];
 #endif
@@ -364,12 +361,9 @@ static NSInteger const kTickTagOffset = 1000000;
 // what is the total width of the content area?
 - (void)setTotalWidthOfScrollContent {
 	NSInteger totalWidth = 0;
-
+    
 	totalWidth = (elementWidth + elementPadding) * _numberOfElements;
     
-	// TODO: is this necessary?
-	totalWidth -= elementPadding; // we add "one too many" in for loop
-
 	if (_scrollView) {
 		// create our scroll view as wide as all the elements to be included
 		_scrollView.contentSize = CGSizeMake(totalWidth, self.bounds.size.height);
@@ -382,12 +376,28 @@ static NSInteger const kTickTagOffset = 1000000;
 	// update content inset if we have element widths
 	if (_numberOfElements != 0) {
 		CGFloat scrollerWidth = _scrollView.frame.size.width;
-
-		CGFloat halfWidth = 0.0f;
+        
+		CGFloat firstElementWidth = 0.0f;
+		CGFloat lastElementWidth = 0.0f;
 		if ( _numberOfElements > 0 ) {
-			halfWidth = elementWidth / 2.0; 
+			int numberOfFirstSubElements = [[self.delegate multiLevelHorizontalPickerView:self childrenForElementAtIndex:0] count];
+			if (numberOfFirstSubElements < 1)
+			{
+				numberOfFirstSubElements = 1;
+			}
+			// Add one to the number of sub elements as we want the calculation based on the number
+			// spaces in the major element
+			firstElementWidth = elementWidth / (numberOfFirstSubElements + 1);
+			
+			int numberOfLastSubElements = [[self.delegate multiLevelHorizontalPickerView:self childrenForElementAtIndex:_numberOfElements - 1] count];
+			if (numberOfLastSubElements < 1)
+			{
+				numberOfLastSubElements = 1;
+			}
+			
+			lastElementWidth = elementWidth / (numberOfLastSubElements + 1);
 		}
-
+        
 		// calculating the inset so that the bouncing on the ends happens more smooothly
 		// - first inset is the distance from the left edge to the left edge of the
 		//     first element when that element is centered under the selection point.
@@ -400,9 +410,9 @@ static NSInteger const kTickTagOffset = 1000000;
 		//  +---------|---------------+
 		//  |####| Element |**********| << UIScrollView
 		//  +-------------------------+
-		CGFloat firstInset = _selectionPoint.x - halfWidth;
-		CGFloat lastInset  = (scrollerWidth - _selectionPoint.x) - halfWidth;
-
+		CGFloat firstInset = _selectionPoint.x - firstElementWidth;
+		CGFloat lastInset  = (scrollerWidth - _selectionPoint.x) - lastElementWidth;
+        
 		_scrollView.contentInset = UIEdgeInsetsMake(0, firstInset, 0, lastInset);
 	}
 }
@@ -413,7 +423,7 @@ static NSInteger const kTickTagOffset = 1000000;
 	if (index >= _numberOfElements) {
 		return 0;
 	}
-
+    
 	for (int i = 0; i < index && i < _numberOfElements; i++) {
 		offset += elementWidth;
 		offset += elementPadding;
@@ -436,9 +446,9 @@ static NSInteger const kTickTagOffset = 1000000;
 	if (majorIndex >= _numberOfElements) {
 		return 0;
 	}
-
+    
 	NSInteger elementOffset = [self offsetForElementAtIndex:majorIndex];
-
+    
     
     NSArray * subElements = [self.delegate multiLevelHorizontalPickerView:self childrenForElementAtIndex:majorIndex];
     NSInteger numberOfSubElements = [subElements count];
@@ -458,11 +468,7 @@ static NSInteger const kTickTagOffset = 1000000;
 
 // what is the frame for the element at the given index?
 - (CGRect)frameForElementAtIndex:(NSInteger)index {
-	CGFloat width = 0.0f;
-	if (_numberOfElements > index) {
-		width = elementWidth;
-	}
-	return CGRectMake([self offsetForElementAtIndex:index], 10.0f, width, 40);
+	return CGRectMake([self offsetForElementAtIndex:index], 10.0f, elementWidth, 40.0f);
 }
 
 // what is the "center", relative to the content offset and adjusted to selection point?
@@ -501,18 +507,6 @@ static NSInteger const kTickTagOffset = 1000000;
 	return 0;
 }
 
-// similar to nearestElementToPoint: however, this method does not look past beginning/end
-- (NSInteger)elementContainingPoint:(CGPoint)point {
-	for (int i = 0; i < _numberOfElements; i++) {
-		CGRect frame = [self frameForElementAtIndex:i];
-		if (CGRectContainsPoint(frame, point)) {
-			return i;
-		}
-	}
-	return -1;
-}
-
-
 // what is the element nearest to the center of the view?
 - (NSInteger)nearestMinorElementToCenterWithMajorIndex:(NSInteger)majorIndex {
 	return [self nearestMinorElementToPoint:[self currentCenter] withMajorIndex:majorIndex];
@@ -547,7 +541,7 @@ static NSInteger const kTickTagOffset = 1000000;
             tempPoint = distance;
             closestSubElement = i;
         }
-	}   
+	}
 	return closestSubElement;
 }
 
@@ -555,10 +549,10 @@ static NSInteger const kTickTagOffset = 1000000;
 
 // move scroll view to position nearest element under the center
 - (void)scrollToElementNearestToCenter {
-
+    
     int majorIndex = [self nearestMajorElementToCenter];
     int minorIndex = [self nearestMinorElementToCenterWithMajorIndex:majorIndex];
- 
+    
     [self scrollToMinorElement:minorIndex withMajorElement:majorIndex  animated:YES];
 }
 
@@ -568,7 +562,16 @@ static NSInteger const kTickTagOffset = 1000000;
 - (void)scrollViewTapped:(UITapGestureRecognizer *)recognizer {
 	if (recognizer.state == UIGestureRecognizerStateRecognized) {
 		CGPoint tapLocation    = [recognizer locationInView:_scrollView];
-		NSInteger elementIndex = [self elementContainingPoint:tapLocation];
+		
+		NSInteger elementIndex = -1;
+		
+		for (int i = 0; i < _numberOfElements; i++) {
+			CGRect frame = CGRectMake([self offsetForElementAtIndex:i], 10.0f, elementWidth, self.bounds.size.height);;
+			if (CGRectContainsPoint(frame, tapLocation)) {
+				elementIndex = i;
+			}
+		}
+
 		if (elementIndex != -1) { // point not in element
 			[self scrollToMinorElement:0 withMajorElement:elementIndex animated:YES];
 		}
@@ -640,7 +643,6 @@ static NSInteger const kTickTagOffset = 1000000;
 - (void)setBackgroundColor:(UIColor *)newColor {
 	[super setBackgroundColor:newColor];
 	_scrollView.backgroundColor = newColor;
-	// TODO: set all subviews as well?
 }
 
 - (void)setIndicatorPosition:(PickerIndicatorPosition)position {

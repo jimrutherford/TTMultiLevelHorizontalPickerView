@@ -43,7 +43,7 @@ int indexCount;
     [dataArray addObject:[NSDictionary dictionaryWithObject:@[]forKey:@"Shell"]];
     [dataArray addObject:[NSDictionary dictionaryWithObject:@[]forKey:@"PHP"]];
     
-    NSLog(@"%@", [dataArray JSONString]);
+    //NSLog(@"%@", [dataArray JSONString]);
 }
 
 - (void) loadDataFromService {
@@ -56,12 +56,12 @@ int indexCount;
     AFHTTPRequestOperation *operation = [[AFHTTPRequestOperation alloc] initWithRequest:request];
     
     [operation setCompletionBlockWithSuccess:^(AFHTTPRequestOperation *operation, id responseObject) {
-        NSLog(@"JSON");
-        NSLog(@"%@", operation.responseString);
+        //NSLog(@"JSON");
+        //NSLog(@"%@", operation.responseString);
         
         dataArray = [operation.responseString objectFromJSONString];
         
-        NSLog(@"count %d", [dataArray count]);
+        //NSLog(@"count %d", [dataArray count]);
         
         
         [_pickerView reloadData];
@@ -210,7 +210,7 @@ int indexCount;
 }
 
 - (NSString *)multiLevelHorizontalPickerView:(TTMultiLevelHorizontalPickerView *)picker titleForMinorElementAtIndex:(NSInteger)minorIndex withMajorIndex:(NSInteger)majorIndex {
-    
+    //NSLog(@"major %i - minor %i", majorIndex, minorIndex);
     if ([dataArray count]>0) {
         NSDictionary * item = [dataArray objectAtIndex:majorIndex];
         NSArray *keys = [item allKeys];
