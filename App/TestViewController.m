@@ -14,16 +14,10 @@
 
 NSMutableArray * dataArray;
 
-// for next button
-int indexCount;
-
 #pragma mark - Init/Dealloc
 - (id)init {
 	self = [super init];
-	if (self) {
-
-		indexCount = 0;
-        
+	if (self) {       
         dataArray = [[NSMutableArray alloc] init];
         
         [self loadMockData];
@@ -42,8 +36,6 @@ int indexCount;
     [dataArray addObject:[NSDictionary dictionaryWithObject:@[]forKey:@"C++"]];
     [dataArray addObject:[NSDictionary dictionaryWithObject:@[]forKey:@"Shell"]];
     [dataArray addObject:[NSDictionary dictionaryWithObject:@[]forKey:@"PHP"]];
-    
-    //NSLog(@"%@", [dataArray JSONString]);
 }
 
 - (void) loadDataFromService {
@@ -56,15 +48,10 @@ int indexCount;
     AFHTTPRequestOperation *operation = [[AFHTTPRequestOperation alloc] initWithRequest:request];
     
     [operation setCompletionBlockWithSuccess:^(AFHTTPRequestOperation *operation, id responseObject) {
-        //NSLog(@"JSON");
-        //NSLog(@"%@", operation.responseString);
         
-        dataArray = [operation.responseString objectFromJSONString];
+	dataArray = [operation.responseString objectFromJSONString];
         
-        //NSLog(@"count %d", [dataArray count]);
-        
-        
-        [_pickerView reloadData];
+	[_pickerView reloadData];
         
     }failure:^(AFHTTPRequestOperation *operation, NSError *error) {
         NSLog(@"error: %@",  operation.responseString);
@@ -113,16 +100,6 @@ int indexCount;
 
 	[self.view addSubview:_pickerView];
 
-	self.nextButton = [UIButton buttonWithType:UIButtonTypeRoundedRect];
-	y = y + tmpFrame.size.height + spacing;
-	tmpFrame = CGRectMake(x, y, width, 50.0f);
-	_nextButton.frame = tmpFrame;
-	[_nextButton addTarget:self action:@selector(nextButtonTapped:) forControlEvents:UIControlEventTouchUpInside];
-	[_nextButton	setTitle:@"Center Element 0" forState:UIControlStateNormal];
-	_nextButton.titleLabel.textColor = [UIColor blackColor];
-	//[self.view addSubview:_nextButton];
-
-
 	y = y + tmpFrame.size.height + spacing;
 	tmpFrame = CGRectMake(x, y, width, 50.0f);
 	_infoLabel = [[UILabel alloc] initWithFrame:tmpFrame];
@@ -137,7 +114,6 @@ int indexCount;
 	[super viewDidUnload];
 	// Release any retained subviews of the main view.
 	self.pickerView = nil;
-	self.nextButton = nil;
 	self.infoLabel  = nil;
 }
 
@@ -171,36 +147,16 @@ int indexCount;
 	_pickerView.frame = tmpFrame;
 	
 	y = y + tmpFrame.size.height + spacing;
-	tmpFrame = _nextButton.frame;
-	tmpFrame.origin.y = y;
-	_nextButton.frame = tmpFrame;
-	
-	y = y + tmpFrame.size.height + spacing;
 	tmpFrame = _infoLabel.frame;
 	tmpFrame.origin.y = y;
 	_infoLabel.frame = tmpFrame;
 
 }
 
-#pragma mark - Button Tap Handlers
-- (void)nextButtonTapped:(id)sender {
-	[_pickerView scrollToMinorElement:0 withMajorElement:indexCount animated:NO];
-	indexCount += 1;
-	if ([dataArray count] <= indexCount) {
-		indexCount = 0;
-	}
-	[_nextButton	setTitle:[NSString stringWithFormat:@"Center Element %d", indexCount]
-				forState:UIControlStateNormal];
-}
-
-
 #pragma mark - HorizontalPickerView DataSource Methods
 - (NSInteger)numberOfElementsInHorizontalPickerView:(TTMultiLevelHorizontalPickerView *)picker {
     return [dataArray count];
 }
-
-#pragma mark - MultiLevelHorizontalPickerView Delegate Methods
-#pragma mark - MultiLevelHorizontalPickerView Delegate Methods
 
 - (NSString *)multiLevelHorizontalPickerView:(TTMultiLevelHorizontalPickerView *)picker titleForElementAtIndex:(NSInteger)index {
     
@@ -210,7 +166,6 @@ int indexCount;
 }
 
 - (NSString *)multiLevelHorizontalPickerView:(TTMultiLevelHorizontalPickerView *)picker titleForMinorElementAtIndex:(NSInteger)minorIndex withMajorIndex:(NSInteger)majorIndex {
-    //NSLog(@"major %i - minor %i", majorIndex, minorIndex);
     if ([dataArray count]>0) {
         NSDictionary * item = [dataArray objectAtIndex:majorIndex];
         NSArray *keys = [item allKeys];
@@ -236,6 +191,7 @@ int indexCount;
     }
 }
 
+#pragma mark - MultiLevelHorizontalPickerView Delegate Methods
 - (void)multiLevelHorizontalPickerView:(TTMultiLevelHorizontalPickerView *)picker didSelectElementAtMajorIndex:(NSInteger)majorIndex withMinorIndex:(NSInteger)minorIndex {
 	self.infoLabel.text = [NSString stringWithFormat:@"Selected major %d & minor %d index", majorIndex, minorIndex];
 }

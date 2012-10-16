@@ -86,7 +86,8 @@ static NSInteger const kTickTagOffset = 1000000;
     
 	SEL titleForElementSelector = @selector(multiLevelHorizontalPickerView:titleForElementAtIndex:);
 	SEL setSelectedSelector     = @selector(setSelectedElement:);
-    
+	SEL childrenForElementAtIndex = @selector(multiLevelHorizontalPickerView:childrenForElementAtIndex:);
+	
 	CGRect visibleBounds   = [self bounds];
 	CGRect scaledViewFrame = CGRectZero;
     
@@ -96,7 +97,6 @@ static NSInteger const kTickTagOffset = 1000000;
         
 		// if the view doesn't intersect, it's not visible, so we can recycle it
 		if (!CGRectIntersectsRect(scaledViewFrame, visibleBounds)) {
-			//NSLog(@"View type %@", [view description]);
             [view removeFromSuperview];
 		} else { // if it is still visible, update it's selected state
 			if ([view respondsToSelector:setSelectedSelector]) {
@@ -125,8 +125,8 @@ static NSInteger const kTickTagOffset = 1000000;
 		view = [_scrollView viewWithTag:[self tagForElementAtIndex:i withType:kLabelTagOffset]];
 		if (!view) {
 			if (i < _numberOfElements) { // make sure we are not requesting data out of range
-				if (self.delegate && [self.delegate respondsToSelector:titleForElementSelector]) {
-					NSString *title = [self.delegate multiLevelHorizontalPickerView:self titleForElementAtIndex:i];
+				if (self.dataSource && [self.dataSource respondsToSelector:titleForElementSelector]) {
+					NSString *title = [self.dataSource multiLevelHorizontalPickerView:self titleForElementAtIndex:i];
 					view = [self labelForForElementAtIndex:i withTitle:title];
 					// use the index as the tag so we can find it later
 					view.tag = [self tagForElementAtIndex:i withType:kLabelTagOffset];
@@ -135,37 +135,40 @@ static NSInteger const kTickTagOffset = 1000000;
             }
         }
         
-        // draw sub elements
-        NSArray * subElements = [self.delegate multiLevelHorizontalPickerView:self childrenForElementAtIndex:i];
-        NSInteger numberOfSubElements = [subElements count];
-        
-        int interval;
-        if (numberOfSubElements < 2) {
-            interval = elementWidth / 2;
-            numberOfSubElements = 1;
-            
+		NSInteger numberOfSubElements = 0;
+		// draw sub elements
+		if (self.dataSource && [self.dataSource respondsToSelector:childrenForElementAtIndex]) {
+			NSArray * subElements = [self.dataSource multiLevelHorizontalPickerView:self childrenForElementAtIndex:i];
+			numberOfSubElements = [subElements count];
+			
+			
+			int interval;
+			if (numberOfSubElements < 2) {
+				interval = elementWidth / 2;
+				numberOfSubElements = 1;
+				
+			}
+			else {
+				interval = elementWidth / (numberOfSubElements + 1);
+			}
+			
+			int location = interval;
+			
+			for (int j = 0; j < numberOfSubElements; j++)
+			{
+				UIImageView *tick = nil;
+				int tag = (kTickTagOffset * (i+1)) + (j+1);
+				tick = (UIImageView*)[_scrollView viewWithTag:[self tagForElementAtIndex:i withType:tag]];
+				if (!tick) {
+					tick = [[UIImageView alloc] initWithImage:[UIImage imageNamed:_minorTickImageName]];
+					tick.frame = CGRectMake(i * elementWidth + location - (tick.frame.size.width/2), visibleBounds.size.height - tick.frame.size.height, tick.frame.size.width, tick.frame.size.height);
+					tick.tag = [self tagForElementAtIndex:i withType:tag];
+					[_scrollView addSubview:tick];
+					
+				}
+				location += interval;
+			}
         }
-        else {
-            interval = elementWidth / (numberOfSubElements + 1);
-        }
-        
-        int location = interval;
-        
-        for (int j = 0; j < numberOfSubElements; j++)
-        {
-            UIImageView *tick = nil;
-            int tag = (kTickTagOffset * (i+1)) + (j+1);
-            tick = (UIImageView*)[_scrollView viewWithTag:[self tagForElementAtIndex:i withType:tag]];
-            if (!tick) {
-                tick = [[UIImageView alloc] initWithImage:[UIImage imageNamed:_minorTickImageName]];
-                tick.frame = CGRectMake(i * elementWidth + location - (tick.frame.size.width/2), visibleBounds.size.height - tick.frame.size.height, tick.frame.size.width, tick.frame.size.height);
-                tick.tag = [self tagForElementAtIndex:i withType:tag];
-                [_scrollView addSubview:tick];
-                
-            }
-            location += interval;
-        }
-        
         UIImageView *divider = nil;
         divider = (UIImageView*)[_scrollView viewWithTag:[self tagForElementAtIndex:i withType:kDividerTagOffset]];
         if (!divider) {
@@ -186,8 +189,8 @@ static NSInteger const kTickTagOffset = 1000000;
     
     SEL titleForMinorElementSelector = @selector(multiLevelHorizontalPickerView:titleForMinorElementAtIndex:withMajorIndex:);
     
-    if (self.delegate && [self.delegate respondsToSelector:titleForMinorElementSelector]) {
-        NSString *title = [self.delegate multiLevelHorizontalPickerView:self titleForMinorElementAtIndex:minorElement withMajorIndex:majorElement];
+    if (self.dataSource && [self.dataSource respondsToSelector:titleForMinorElementSelector]) {
+        NSString *title = [self.dataSource multiLevelHorizontalPickerView:self titleForMinorElementAtIndex:minorElement withMajorIndex:majorElement];
         
         _minorElementTitleLabel.text = title;
     }
@@ -380,7 +383,7 @@ static NSInteger const kTickTagOffset = 1000000;
 		CGFloat firstElementWidth = 0.0f;
 		CGFloat lastElementWidth = 0.0f;
 		if ( _numberOfElements > 0 ) {
-			int numberOfFirstSubElements = [[self.delegate multiLevelHorizontalPickerView:self childrenForElementAtIndex:0] count];
+			int numberOfFirstSubElements = [[self.dataSource multiLevelHorizontalPickerView:self childrenForElementAtIndex:0] count];
 			if (numberOfFirstSubElements < 1)
 			{
 				numberOfFirstSubElements = 1;
@@ -389,7 +392,7 @@ static NSInteger const kTickTagOffset = 1000000;
 			// spaces in the major element
 			firstElementWidth = elementWidth / (numberOfFirstSubElements + 1);
 			
-			int numberOfLastSubElements = [[self.delegate multiLevelHorizontalPickerView:self childrenForElementAtIndex:_numberOfElements - 1] count];
+			int numberOfLastSubElements = [[self.dataSource multiLevelHorizontalPickerView:self childrenForElementAtIndex:_numberOfElements - 1] count];
 			if (numberOfLastSubElements < 1)
 			{
 				numberOfLastSubElements = 1;
@@ -450,7 +453,7 @@ static NSInteger const kTickTagOffset = 1000000;
 	NSInteger elementOffset = [self offsetForElementAtIndex:majorIndex];
     
     
-    NSArray * subElements = [self.delegate multiLevelHorizontalPickerView:self childrenForElementAtIndex:majorIndex];
+    NSArray * subElements = [self.dataSource multiLevelHorizontalPickerView:self childrenForElementAtIndex:majorIndex];
     NSInteger numberOfSubElements = [subElements count];
     
     NSInteger subElementOffset = 0;
@@ -514,8 +517,8 @@ static NSInteger const kTickTagOffset = 1000000;
 
 // what is the element nearest to the given point?
 - (NSInteger)nearestMinorElementToPoint:(CGPoint)point withMajorIndex:(NSInteger)majorIndex  {
-    
-    NSArray * subElements = [self.delegate multiLevelHorizontalPickerView:self childrenForElementAtIndex:majorIndex];
+	
+    NSArray * subElements = [self.dataSource multiLevelHorizontalPickerView:self childrenForElementAtIndex:majorIndex];
     NSInteger numberOfSubElements = [subElements count];
     
     if (numberOfSubElements < 2) return numberOfSubElements;

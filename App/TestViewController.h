@@ -15,7 +15,6 @@
 @interface TestViewController : UIViewController <TTMultiLevelHorizontalPickerViewDelegate, TTMultiLevelHorizontalPickerViewDataSource> { }
 
 @property (nonatomic, retain) TTMultiLevelHorizontalPickerView *pickerView;
-@property (nonatomic, retain) UIButton *nextButton;
 @property (nonatomic, retain) UILabel *infoLabel;
 
 @end
