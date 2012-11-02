@@ -6,8 +6,6 @@
 //
 
 #import "TestViewController.h"
-#import "JSONKit.h"
-#import "AFNetworking.h"
 
 
 @implementation TestViewController
@@ -40,24 +38,7 @@ NSMutableArray * dataArray;
 
 - (void) loadDataFromService {
     NSString *dataURL = @"http://localhost:8888/data/demo.json";
-    
-    
-    NSURL *url = [[NSURL alloc] initWithString:dataURL];
-    NSURLRequest *request = [[NSURLRequest alloc] initWithURL:url];
-    
-    AFHTTPRequestOperation *operation = [[AFHTTPRequestOperation alloc] initWithRequest:request];
-    
-    [operation setCompletionBlockWithSuccess:^(AFHTTPRequestOperation *operation, id responseObject) {
-        
-	dataArray = [operation.responseString objectFromJSONString];
-        
-	[_pickerView reloadData];
-        
-    }failure:^(AFHTTPRequestOperation *operation, NSError *error) {
-        NSLog(@"error: %@",  operation.responseString);
-    }];
-    
-    [operation start];
+
 }
 
 - (void)didReceiveMemoryWarning {
