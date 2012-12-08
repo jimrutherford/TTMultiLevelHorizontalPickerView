@@ -258,7 +258,7 @@ static NSInteger const kTickTagOffset = 1000000;
     _backgroundImageView = nil;
     _backgroundImageView = [[UIImageView alloc] initWithImage:[UIImage imageNamed:_backgroundImageName]];
     
-	_backgroundImageView.frame = CGRectMake(0.0f, 0.0f, self.frame.size.width, self.frame.size.height);
+	_backgroundImageView.frame = self.bounds;
 
 	[self addSubview:_backgroundImageView];
 	
