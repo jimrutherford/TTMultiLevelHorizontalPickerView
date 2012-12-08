@@ -14,7 +14,8 @@
 	UILabel *_minorElementTitleLabel;
     
 	UIImageView *_selectionIndicatorView;
-    
+    UIImageView *_backgroundImageView;
+	
 	NSInteger elementPadding;
     
 	NSInteger elementWidth;
@@ -250,6 +251,17 @@ static NSInteger const kTickTagOffset = 1000000;
         
         [self addSubview:_minorElementTitleLabel];
     }
+}
+
+-(void) drawBackground {
+	[_backgroundImageView removeFromSuperview];
+    _backgroundImageView = nil;
+    _backgroundImageView = [[UIImageView alloc] initWithImage:[UIImage imageNamed:_backgroundImageName]];
+    
+	_backgroundImageView.frame = CGRectMake(0.0f, 0.0f, self.frame.size.width, self.frame.size.height);
+
+	[self addSubview:_backgroundImageView];
+	
 }
 
 - (void)drawPositionIndicator {
@@ -670,6 +682,17 @@ static NSInteger const kTickTagOffset = 1000000;
 		_selectionIndicatorImageName = indicatorImageName;
         
 		[self drawPositionIndicator];
+	}
+}
+
+- (void)setBackgroundImageName:(NSString *)bgImageName {
+	if (_backgroundImageName != bgImageName) {
+		if (_backgroundImageName) {
+			[_backgroundImageView removeFromSuperview];
+		}
+		_backgroundImageName = bgImageName;
+        
+		[self drawBackground];
 	}
 }
 
