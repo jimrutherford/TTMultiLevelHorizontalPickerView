@@ -1,7 +1,6 @@
-
 Pod::Spec.new do |s|
   s.name         = "TTMultiLevelHorizontalPickerView"
-  s.version      = "0.0.1"
+  s.version      = "0.0.2"
   s.summary      = "A multi-level horizontal picker view that mimics the features found in Apple's Podcast app."
   s.homepage     = "https://github.com/jimrutherford/TTMultiLevelHorizontalPickerView"
   s.license      = {
